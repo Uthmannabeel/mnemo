@@ -21,5 +21,7 @@ jobs:
       - run: python -m tests.test_learning
       # Experiment 2 invariant: all 5 org conventions distilled, memory beats zero-shot
       - run: python -m tests.test_org_learning
+      # Unlearning invariant: a changed org policy flips its rule (supersede, not pile up)
+      - run: python -m tests.test_adaptation
       # API loop: seed -> triage (fired provenance) -> feedback reinforcement -> eval cache
       - run: python -m tests.test_api
