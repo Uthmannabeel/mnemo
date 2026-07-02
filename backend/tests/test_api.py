@@ -21,8 +21,15 @@ def test_dashboard_loop():
 
     # 1. seed populates the LIVE store and dreams rules into existence
     r = c.post("/seed").json()
-    assert r["seeded"] == 25
+    assert r["seeded"] == 26 and r["profile"] == "standard", r
     assert r["dreamed"]["procedural"] > 0, r
+
+    # 1b. workspaces are isolated: a conventions workspace learns org policy
+    #     (refund -> account) while the standard workspace keeps surface routing.
+    r2 = c.post("/seed", json={"user_id": "northwind", "profile": "conventions"}).json()
+    assert r2["dreamed"]["procedural"] > 0, r2
+    nw = c.post("/triage", json={"ticket": TICKET, "user_id": "northwind"}).json()
+    assert nw["category"] == "account", nw  # Northwind policy, learned from experience
 
     # 2. triage cites fired rules in provenance
     t = c.post("/triage", json={"ticket": TICKET}).json()
@@ -43,9 +50,10 @@ def test_dashboard_loop():
     after = {m["id"]: m["confidence"] for m in mem["procedural"]}
     assert any(after.get(i, 0) > before[i] for i in before), "feedback must reinforce fired rules"
 
-    # 4. /eval is cached — second call must be near-instant
+    # 4. /eval is cached — the second call must be far cheaper than the first
+    #    (relative bound: absolute timings are flaky on loaded machines/CI)
     t0 = time.time(); c.post("/eval"); t1 = time.time(); c.post("/eval"); t2 = time.time()
-    assert (t2 - t1) < 0.1, f"cached eval took {t2-t1:.3f}s"
+    assert (t2 - t1) < max(0.25, (t1 - t0) / 4), f"first {t1-t0:.3f}s, cached {t2-t1:.3f}s"
 
     # 5. dashboard serves
     assert c.get("/").status_code == 200

@@ -4,7 +4,7 @@
 > An agent with a human-like, four-tier memory that autonomously accumulates
 > experience and makes **measurably** more accurate decisions across sessions.
 
-<p align="center"><img src="docs/architecture.svg" alt="Mnemo architecture" width="880"></p>
+<p align="center"><img src="docs/console.png" alt="Mnemo console — memory browser, decision ledger, and the two experiments" width="920"></p>
 
 Most "memory agents" are a chatbot bolted to a vector database. Mnemo is a
 **cognitive memory architecture**: raw experience flows in as episodes, and an
@@ -24,7 +24,7 @@ per-decision context budget across all three arms:
 session:      1    2    3    4    5    6    7    8
 no-memory     28   24   16   12   24   24   16   24   mean  21%   (≈ chance for 5 classes)
 episodic      28   68   60   56   72   52   68   80   mean  60%   (raw-RAG baseline)
-MNEMO         20   76   72   72   88   56   84  100   mean  71%   (episodic + Dreaming)
+MNEMO         20   72   72   64   84   72   84  100   mean  71%   (episodic + Dreaming)
 ```
 
 - **No-memory** never learns — flat at chance.
@@ -32,6 +32,18 @@ MNEMO         20   76   72   72   88   56   84  100   mean  71%   (episodic + Dr
 - **Mnemo** distils experience into high-signal rules and, under the
   **same finite context budget**, converges faster and higher (**+10.5 pts mean**,
   **100% by session 8**).
+- **Token economics:** Mnemo wins while consuming a **50% smaller memory context**
+  per decision (574 vs 1155 chars) — signal per token, the practical answer to
+  context rot. Test-enforced like everything else.
+
+And two properties most memory agents can't demonstrate:
+
+- **It unlearns.** When an org *changes* a policy, recency-weighted consolidation
+  supersedes the stale rule within a few corrections instead of letting history
+  outvote the present forever (`tests/test_adaptation.py`).
+- **Workspaces are real memories, not filters.** Seed two orgs with different
+  conventions and the *same ticket* routes differently in each — each decision
+  citing that org's own learned policy (`tests/test_api.py`).
 
 Reproduce it in ~2 seconds, no API key required:
 
@@ -78,10 +90,10 @@ python -m app.eval.live_harness --yes    # live Qwen3.7-Max run (~160 calls), re
 ```
 
 Offline pipeline validation (deterministic mock, same code path): the memory arm's
-convention accuracy climbs **14% → 86%** across 5 sessions while the no-memory arm
-stays flat — and all five conventions are distilled into correct procedural rules
-(asserted by `tests/test_org_learning.py`). The committed `results/` JSON from the
-live run includes every prediction for auditability.
+convention accuracy climbs **14% → 71%** (final-session gap **+57 pts**) while the
+no-memory arm stays flat — and all five conventions are distilled into correct
+procedural rules (asserted by `tests/test_org_learning.py`). The committed `results/`
+JSON from the live run includes every prediction for auditability.
 
 > **The claim, precisely:** frontier models can't know your organization.
 > Mnemo makes Qwen3.7-Max learn it — measurably.
@@ -90,31 +102,7 @@ live run includes every prediction for auditability.
 
 ## Architecture
 
-```mermaid
-flowchart TB
-    subgraph Ingest
-        T[Incoming ticket] --> A[TriageAgent]
-    end
-
-    A -->|retrieve, finite budget| R{{Blended working set<br/>procedural + semantic + episodic}}
-    R --> D[Decision + provenance]
-    D -->|Qwen3.7-Max reasons over memory| A
-    D --> O[(Outcome / feedback)]
-    O -->|write raw experience| EP[(Episodic memory<br/>pgvector)]
-
-    subgraph Dreaming[Dreaming loop · Alibaba Cloud Function Compute cron]
-        EP -->|reflect · Qwen3.7-Max| C[Consolidator]
-        C -->|distil facts| SE[(Semantic memory)]
-        C -->|distil rules| PR[(Procedural memory)]
-        C -->|decay · conflict-resolve| PR
-    end
-
-    SE --> R
-    PR --> R
-
-    classDef qwen fill:#6b46c1,color:#fff;
-    class A,C qwen;
-```
+<p align="center"><img src="docs/architecture.svg" alt="Mnemo architecture" width="920"></p>
 
 **Four tiers (modelled on human memory):**
 

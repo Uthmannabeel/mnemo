@@ -42,6 +42,9 @@
     border-bottom:1px solid var(--border)}
   .wordmark{font-family:var(--mono);font-weight:600;font-size:14px;letter-spacing:.14em}
   .wordmark span{color:var(--faint);font-weight:400;letter-spacing:0;margin-left:10px;font-size:12.5px;font-family:var(--sans)}
+  .ws{display:flex;align-items:center;gap:7px;font-size:11px;color:var(--faint);margin-left:6px}
+  .ws select{font-family:var(--mono);font-size:11.5px;color:var(--ink);background:var(--surface);
+    border:1px solid var(--border-strong);border-radius:6px;padding:4px 6px;cursor:pointer}
   .env{margin-left:auto;display:flex;align-items:center;gap:14px;font-family:var(--mono);font-size:11.5px;color:var(--muted)}
   .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--good);margin-right:6px;vertical-align:1px}
   .dot.off{background:var(--faint)}
@@ -140,6 +143,12 @@
 
 <header class="top">
   <div class="wordmark">MNEMO<span>memory engine for support triage</span></div>
+  <label class="ws mono">workspace
+    <select id="ws">
+      <option value="northwind" selected>Northwind</option>
+      <option value="globex">Globex</option>
+    </select>
+  </label>
   <div class="env mono" id="env"><span class="dot off"></span>connecting</div>
   <a class="mono" style="font-size:11.5px" href="https://github.com/Uthmannabeel/mnemo">source</a>
 </header>
@@ -246,6 +255,13 @@ const CATS = ['billing','technical','account','shipping','feedback'];
 const $ = id => document.getElementById(id);
 let last = null;
 
+/* Workspaces are isolated memories: Northwind has learned org conventions
+   (refunds -> account managers, Falcon -> white-glove team); Globex routes by
+   surface reading. The same ticket resolves differently in each — that's
+   personalization you can verify. */
+const PROFILES = { northwind:'conventions', globex:'standard' };
+const wsId = () => $('ws').value;
+
 /* ---------- header ---------- */
 async function health(){
   try{
@@ -268,7 +284,7 @@ function esc(s){ const d=document.createElement('div'); d.textContent=s; return 
 
 async function refreshMemory(){
   try{
-    const m = await (await fetch(API+'/memory')).json();
+    const m = await (await fetch(API+'/memory?user_id='+wsId())).json();
     const pro = m.procedural||[], sem = m.semantic||[], epi = m.episodic||[];
     $('nEpi').textContent = epi.length; $('nSem').textContent = sem.length; $('nPro').textContent = pro.length;
     const fill = (listId, cId, arr, empty, monoTxt, n=6) => {
@@ -292,8 +308,8 @@ async function triage(){
   $('btnTriage').disabled = true;
   try{
     const r = await (await fetch(API+'/triage',{method:'POST',headers:{'content-type':'application/json'},
-      body:JSON.stringify({ticket:t})})).json();
-    last = {ticket:t, category:r.category, fired:r.fired_memory_ids||[], used:r.used_memory_ids||[]};
+      body:JSON.stringify({ticket:t, user_id:wsId()})})).json();
+    last = {ticket:t, ws:wsId(), category:r.category, fired:r.fired_memory_ids||[], used:r.used_memory_ids||[]};
     const prov = r.provenance||[];
     const fired = prov.filter(p=>p.fired);
     const tiers = [...new Set(prov.map(p=>p.tier))].join(', ') || 'none';
@@ -327,7 +343,7 @@ async function teach(trueCat){
   if(!last) return;
   const r = await (await fetch(API+'/feedback',{method:'POST',headers:{'content-type':'application/json'},
     body:JSON.stringify({ticket:last.ticket, predicted_category:last.category, true_category:trueCat,
-      fired_memory_ids:last.fired, used_memory_ids:last.used})})).json();
+      fired_memory_ids:last.fired, used_memory_ids:last.used, user_id:last.ws})})).json();
   const ok = trueCat===last.category;
   const v = $('verdict');
   v.className = 'verdict ' + (ok?'ok':'fix');
@@ -342,18 +358,20 @@ async function teach(trueCat){
 
 /* ---------- strip actions ---------- */
 async function seed(){
+  const ws = wsId();
   $('btnSeed').disabled = true;
-  $('stripNote').textContent = 'Routing 25 sample tickets through the live agent…';
+  $('stripNote').textContent = `Routing sample tickets through ${ws}'s workload…`;
   try{
-    const r = await (await fetch(API+'/seed',{method:'POST'})).json();
+    const r = await (await fetch(API+'/seed',{method:'POST',headers:{'content-type':'application/json'},
+      body:JSON.stringify({user_id:ws, profile:PROFILES[ws]||'standard'})})).json();
     $('stripNote').textContent =
-      `Seeded ${r.seeded} tickets (${r.correct} correct before learning) · consolidation distilled ${r.dreamed.procedural||0} rules and ${r.dreamed.semantic||0} facts.`;
+      `Seeded ${r.seeded} ${ws} tickets (${r.correct} correct before learning) · consolidation distilled ${r.dreamed.procedural||0} rules and ${r.dreamed.semantic||0} facts.`;
   } finally { $('btnSeed').disabled = false; refreshMemory(); }
 }
 async function dream(){
   $('btnDream').disabled = true;
   try{
-    const r = await (await fetch(API+'/consolidate',{method:'POST'})).json();
+    const r = await (await fetch(API+'/consolidate?user_id='+wsId(),{method:'POST'})).json();
     $('stripNote').textContent = r.episodes
       ? `Consolidation reflected on ${r.episodes} new episodes → +${r.procedural} rules, +${r.semantic} facts.`
       : 'Nothing new to consolidate — teach a few outcomes first.';
@@ -422,6 +440,14 @@ $('ticket').addEventListener('keydown', e=>{ if(e.key==='Enter') triage(); });
 document.querySelectorAll('.chips button').forEach(b=>{
   b.onclick = ()=>{ $('ticket').value = b.dataset.t; triage(); };
 });
+const PRIMER_HTML = $('ledger').innerHTML;  // captured at load, restored on switch
+$('ws').onchange = ()=>{
+  // A decision belongs to the workspace that made it — reset the bench on switch.
+  $('stripNote').textContent=''; $('teach').hidden=true; last=null;
+  $('ledger').innerHTML = PRIMER_HTML;
+  document.querySelectorAll('.chips button').forEach(b=>{ b.onclick = ()=>{ $('ticket').value=b.dataset.t; triage(); }; });
+  refreshMemory();
+};
 $('btnSeed').onclick = seed;
 $('btnDream').onclick = dream;
 

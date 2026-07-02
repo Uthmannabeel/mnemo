@@ -124,25 +124,46 @@ def memory(user_id: str = "default") -> dict:
     return _manager.snapshot(user_id=user_id)
 
 
+class SeedIn(BaseModel):
+    user_id: str = "default"
+    # "standard": generic tickets, surface reading is truth (e.g. Globex).
+    # "conventions": org-idiosyncratic routing policies (e.g. Northwind:
+    #   refunds -> account managers, Falcon tickets -> the white-glove team...).
+    profile: str = "standard"
+
+
 @app.post("/seed")
-def seed(user_id: str = "default") -> dict:
-    """Populate the LIVE memory store with one session of demo experience.
+def seed(body: SeedIn | None = None) -> dict:
+    """Populate a workspace's LIVE memory with two sessions of demo experience.
 
-    Runs 25 synthetic tickets through the real agent (predict → learn), then one
-    Dreaming pass — so the tiers panel, provenance, and triage all have substance.
-    Distinct seed from the benchmark so it can't be mistaken for the experiment.
+    Runs synthetic tickets through the real agent (predict → learn) with a Dreaming
+    pass per session. Workspaces are isolated by user_id — seed two with different
+    profiles and the same ticket routes differently in each, each citing its own
+    learned rules. Distinct seeds from the benchmarks so this can't be mistaken
+    for the experiments.
     """
-    from .eval.dataset import make_sessions
+    body = body or SeedIn()
+    if body.profile == "conventions":
+        from .eval.org_dataset import make_org_sessions
 
-    session = make_sessions(n_sessions=1, per_session=25, seed=99)[0]
-    correct = 0
-    for ticket, truth in session:
-        d = _agent.predict(ticket, user_id=user_id)
-        if d.prediction["category"] == truth:
-            correct += 1
-        _agent.learn(d, truth, user_id=user_id)
-    dreamed = _consolidator.run(user_id=user_id)
-    return {"seeded": len(session), "correct": correct, "dreamed": dreamed}
+        sessions = [[(t, c) for t, c, _ in s] for s in make_org_sessions(2, 15, seed=97)]
+    else:
+        from .eval.dataset import make_sessions
+
+        sessions = make_sessions(n_sessions=2, per_session=13, seed=99)
+
+    seeded = correct = 0
+    dreamed = {"procedural": 0, "semantic": 0, "episodes": 0}
+    for session in sessions:
+        for ticket, truth in session:
+            d = _agent.predict(ticket, user_id=body.user_id)
+            correct += int(d.prediction["category"] == truth)
+            seeded += 1
+            _agent.learn(d, truth, user_id=body.user_id)
+        summary = _consolidator.run(user_id=body.user_id)
+        for k in dreamed:
+            dreamed[k] += summary.get(k, 0)
+    return {"seeded": seeded, "correct": correct, "profile": body.profile, "dreamed": dreamed}
 
 
 _eval_cache: dict[tuple[int, int, int], dict] = {}

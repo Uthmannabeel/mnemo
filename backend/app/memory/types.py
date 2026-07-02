@@ -92,5 +92,6 @@ class Decision:
     used_memory_ids: list[str]       # everything retrieved (provenance / "what I looked at")
     rationale: str
     fired_memory_ids: list[str] = field(default_factory=list)  # rules that actually drove the call
+    context_chars: int = 0  # size of the memory context this decision consumed (token economics)
     id: str = field(default_factory=_uid)
     created_at: datetime = field(default_factory=_now)

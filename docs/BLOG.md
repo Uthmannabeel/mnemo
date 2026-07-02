@@ -133,7 +133,7 @@ the agent does with memory.
 session:      1    2    3    4    5    6    7    8
 no-memory     28   24   16   12   24   24   16   24   mean  21%   (≈ chance, 5 classes)
 episodic      28   68   60   56   72   52   68   80   mean  60%   (raw-RAG baseline)
-MNEMO         20   76   72   72   88   56   84  100   mean  71%   (episodic + Dreaming)
+MNEMO         20   72   72   64   84   72   84  100   mean  71%   (episodic + Dreaming)
 ```
 
 - **No memory** never learns — it sits at chance.
@@ -174,7 +174,7 @@ zero-shot; they're not in any training distribution.
 
 Two arms, same tickets: **Qwen3.7-Max alone** vs **Qwen3.7-Max + Mnemo**. The alone arm
 stays wrong on convention tickets forever. The memory arm learns them from feedback —
-in validation its convention accuracy climbs from 14% to 86% in five sessions, and every
+in validation its convention accuracy climbs from 14% to 71% in five sessions, and every
 one of the five conventions ends up as an explicit, inspectable procedural rule
 ("IF ticket mentions 'refund' THEN category=account"). That's the claim in one line:
 **frontier models can't know your organization — memory is how they learn it.**

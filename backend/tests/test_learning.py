@@ -35,6 +35,11 @@ def test_memory_improves_accuracy():
     assert full["memory_counts"]["procedural"] > 0
     assert full["memory_counts"]["semantic"] > 0
 
+    # 5. Token economics: Mnemo wins while consuming a SMALLER memory context
+    #    than raw retrieval — signal per token, the answer to context rot.
+    assert full["avg_context_chars"] < episodic["avg_context_chars"] * 0.8, (
+        full["avg_context_chars"], episodic["avg_context_chars"])
+
 
 if __name__ == "__main__":
     test_memory_improves_accuracy()

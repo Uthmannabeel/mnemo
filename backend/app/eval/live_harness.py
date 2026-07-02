@@ -105,9 +105,9 @@ def run_experiment(
         arm["convention_mean"] = round(sum(r["convention_acc"] for r in rows) / len(rows), 4)
         arm["plain_mean"] = round(sum(r["plain_acc"] for r in rows) / len(rows), 4)
         if mode == "full":
-            arm["distilled_rules"] = [
-                r.content for r in manager.store.all("default", Tier.PROCEDURAL)
-            ]
+            rules = manager.store.all("default", Tier.PROCEDURAL)
+            rules.sort(key=lambda r: (-r.confidence, r.content))  # corroborated org rules first
+            arm["distilled_rules"] = [r.content for r in rules]
 
     a, m = result["arms"]["qwen-alone"], result["arms"]["qwen+mnemo"]
     result["headline"] = {

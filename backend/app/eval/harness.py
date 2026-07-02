@@ -39,12 +39,15 @@ def run_arm(mode: str, n_sessions: int, per_session: int, seed: int) -> dict:
     sessions = make_sessions(n_sessions, per_session, seed)
 
     acc_by_session: list[float] = []
+    ctx_total = ctx_n = 0
     for session in sessions:
         correct = 0
         for ticket, truth in session:
             decision = agent.predict(ticket)
             if decision.prediction["category"] == truth:
                 correct += 1
+            ctx_total += decision.context_chars
+            ctx_n += 1
             agent.learn(decision, truth)  # writes the episode (all arms)
         acc_by_session.append(round(correct / len(session), 4))
         # Only the full arm dreams; that is the sole difference between full & episodic.
@@ -59,6 +62,7 @@ def run_arm(mode: str, n_sessions: int, per_session: int, seed: int) -> dict:
         "last": acc_by_session[-1],
         "improvement": round(acc_by_session[-1] - acc_by_session[0], 4),
         "mean": round(sum(acc_by_session) / len(acc_by_session), 4),
+        "avg_context_chars": round(ctx_total / max(ctx_n, 1)),  # token economics
         "memory_counts": {tier: len(items) for tier, items in snap.items()},
     }
 
@@ -98,10 +102,15 @@ def main() -> None:
         arm = result["arms"][mode]
         print(f"  {labels[mode]} last {arm['last']*100:5.1f}%  {_bar(arm['last'])}")
     full, epi = result["arms"]["full"], result["arms"]["episodic"]
+    ctx_saving = 1 - full["avg_context_chars"] / max(epi["avg_context_chars"], 1)
     print(
         f"\n  Mnemo vs episodic-RAG:  +{(full['mean']-epi['mean'])*100:.1f} pts mean accuracy"
         f"  |  distilled rules: {full['memory_counts']['procedural']} procedural,"
-        f" {full['memory_counts']['semantic']} semantic\n"
+        f" {full['memory_counts']['semantic']} semantic"
+    )
+    print(
+        f"  token economics:  {full['avg_context_chars']} vs {epi['avg_context_chars']} avg context chars/decision"
+        f"  ({ctx_saving*100:.0f}% smaller context, higher accuracy)\n"
     )
 
 

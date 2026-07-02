@@ -576,7 +576,7 @@
         {
           "session": 2,
           "convention_acc": 0.2857,
-          "plain_acc": 0.25
+          "plain_acc": 0.125
         },
         {
           "session": 3,
@@ -585,13 +585,13 @@
         },
         {
           "session": 4,
-          "convention_acc": 0.4286,
-          "plain_acc": 0.5
+          "convention_acc": 0.2857,
+          "plain_acc": 0.625
         },
         {
           "session": 5,
-          "convention_acc": 0.8571,
-          "plain_acc": 0.25
+          "convention_acc": 0.7143,
+          "plain_acc": 0.375
         }
       ],
       "predictions": [
@@ -704,7 +704,7 @@
           "session": 2,
           "ticket": "FYI, I love the product but wish the mobile app had offline support. Not sure if this is the right channel but figured I'd ask anyway.",
           "truth": "feedback",
-          "predicted": "technical",
+          "predicted": "account",
           "convention": false
         },
         {
@@ -760,7 +760,7 @@
           "session": 2,
           "ticket": "This is my second time reaching out about something this month. Hi, The Acme integration sync throws timeout errors all morning. Thanks. My colleague suggested I contact support directly about this.",
           "truth": "shipping",
-          "predicted": "technical",
+          "predicted": "account",
           "convention": true
         },
         {
@@ -781,21 +781,21 @@
           "session": 2,
           "ticket": "Hi, The new beta dashboard breaks on mobile, thought you should know. -- a frustrated user My colleague suggested I contact support directly about this.",
           "truth": "feedback",
-          "predicted": "shipping",
+          "predicted": "technical",
           "convention": true
         },
         {
           "session": 2,
           "ticket": "I've been a customer for three years now and generally really enjoy the service. Hello team, Getting a 'connection timed out' error whenever I open the reports tab. -- a frustrated user",
           "truth": "technical",
-          "predicted": "technical",
+          "predicted": "feedback",
           "convention": false
         },
         {
           "session": 2,
           "ticket": "For context, I'm on the annual plan and use the product daily for work. I've been a customer for three years now and generally really enjoy the service. FYI, I cancelled last week but was still charged for a renewal today. Please advise.",
           "truth": "billing",
-          "predicted": "technical",
+          "predicted": "account",
           "convention": false
         },
         {
@@ -949,7 +949,7 @@
           "session": 4,
           "ticket": "Hi, The hardware kit for our Project Falcon pilot hasn't arrived, tracking is stuck. Please advise. I've been a customer for three years now and generally really enjoy the service.",
           "truth": "technical",
-          "predicted": "technical",
+          "predicted": "billing",
           "convention": true
         },
         {
@@ -1005,28 +1005,28 @@
           "session": 4,
           "ticket": "This is my second time reaching out about something this month. Urgent: A suggestion: it would be great to have keyboard shortcuts for navigation. Thanks.",
           "truth": "feedback",
-          "predicted": "technical",
+          "predicted": "feedback",
           "convention": false
         },
         {
           "session": 4,
           "ticket": "For context, I'm on the annual plan and use the product daily for work. Hi, I need to reset my password but the reset email never arrives. Please advise.",
           "truth": "account",
-          "predicted": "technical",
+          "predicted": "billing",
           "convention": false
         },
         {
           "session": 5,
           "ticket": "I've been a customer for three years now and generally really enjoy the service. Hi, Need a pricing breakdown for the Project Falcon add-on seats. Appreciate the help.",
           "truth": "technical",
-          "predicted": "technical",
+          "predicted": "billing",
           "convention": true
         },
         {
           "session": 5,
           "ticket": "My colleague suggested I contact support directly about this. Urgent: Where is my order? The courier tracking says pending for five days.",
           "truth": "shipping",
-          "predicted": "billing",
+          "predicted": "shipping",
           "convention": false
         },
         {
@@ -1040,7 +1040,7 @@
           "session": 5,
           "ticket": "My colleague suggested I contact support directly about this. Hello team, Why did my monthly payment go up? I want a breakdown of the new pricing. Appreciate the help. For context, I'm on the annual plan and use the product daily for work.",
           "truth": "billing",
-          "predicted": "account",
+          "predicted": "billing",
           "convention": false
         },
         {
@@ -1082,7 +1082,7 @@
           "session": 5,
           "ticket": "Hoping we can sort this out quickly as it's a bit time sensitive. I've been a customer for three years now and generally really enjoy the service. I can't log in \u2014 the page just spins and never loads the dashboard. Appreciate the help.",
           "truth": "technical",
-          "predicted": "technical",
+          "predicted": "account",
           "convention": false
         },
         {
@@ -1110,7 +1110,7 @@
           "session": 5,
           "ticket": "Just wanted to say the new dark mode looks fantastic, great work team! -- a frustrated user This is my second time reaching out about something this month.",
           "truth": "feedback",
-          "predicted": "technical",
+          "predicted": "billing",
           "convention": false
         },
         {
@@ -1122,42 +1122,64 @@
         }
       ],
       "convention_first": 0.1429,
-      "convention_last": 0.8571,
-      "convention_mean": 0.4857,
-      "plain_mean": 0.325,
+      "convention_last": 0.7143,
+      "convention_mean": 0.4286,
+      "plain_mean": 0.35,
       "distilled_rules": [
-        "IF ticket mentions 'app' THEN category=technical",
+        "IF ticket mentions 'work' THEN category=technical",
+        "IF ticket mentions 'help' THEN category=account",
         "IF ticket mentions 'bother' THEN category=technical",
         "IF ticket mentions 'busy' THEN category=technical",
+        "IF ticket mentions 'doing' THEN category=technical",
+        "IF ticket mentions 'know' THEN category=technical",
+        "IF ticket mentions 'sorry' THEN category=technical",
+        "IF ticket mentions 'your' THEN category=technical",
+        "IF ticket mentions 'app' THEN category=technical",
         "IF ticket mentions 'code' THEN category=technical",
         "IF ticket mentions 'crashes' THEN category=technical",
-        "IF ticket mentions 'doing' THEN category=technical",
-        "IF ticket mentions 'error' THEN category=technical",
-        "IF ticket mentions 'every' THEN category=technical",
-        "IF ticket mentions 'file' THEN category=technical",
-        "IF ticket mentions 'great' THEN category=technical",
-        "IF ticket mentions 'help' THEN category=account",
-        "IF ticket mentions 'last' THEN category=billing",
-        "IF ticket mentions 'sorry' THEN category=technical",
-        "IF ticket mentions 'week' THEN category=billing",
-        "IF ticket mentions 'your' THEN category=technical",
-        "IF ticket mentions 'acme' THEN category=shipping",
-        "IF ticket mentions 'beta' THEN category=feedback",
         "IF ticket mentions 'cancelled' THEN category=billing",
         "IF ticket mentions 'charged' THEN category=billing",
-        "IF ticket mentions 'falcon' THEN category=technical",
-        "IF ticket mentions 'project' THEN category=technical",
-        "IF ticket mentions 'order' THEN category=billing",
+        "IF ticket mentions 'last' THEN category=billing",
+        "IF ticket mentions 'renewal' THEN category=billing",
+        "IF ticket mentions 'still' THEN category=billing",
+        "IF ticket mentions 'today' THEN category=billing",
+        "IF ticket mentions 'week' THEN category=billing",
+        "IF ticket mentions 'acme' THEN category=shipping",
+        "IF ticket mentions 'beta' THEN category=feedback",
+        "IF ticket mentions 'sync' THEN category=shipping",
+        "IF ticket mentions 'error' THEN category=technical",
+        "IF ticket mentions 'mobile' THEN category=feedback",
+        "IF ticket mentions 'advise' THEN category=billing",
         "IF ticket mentions 'purchase' THEN category=billing",
+        "IF ticket mentions 'breakdown' THEN category=billing",
+        "IF ticket mentions 'did' THEN category=billing",
+        "IF ticket mentions 'monthly' THEN category=billing",
+        "IF ticket mentions 'pricing' THEN category=billing",
+        "IF ticket mentions 'want' THEN category=billing",
+        "IF ticket mentions 'why' THEN category=billing",
+        "IF ticket mentions 'yesterday' THEN category=shipping",
+        "IF ticket mentions 'isn' THEN category=shipping",
+        "IF ticket mentions 'orders' THEN category=shipping",
+        "IF ticket mentions 'since' THEN category=shipping",
+        "IF ticket mentions 'syncing' THEN category=shipping",
+        "IF ticket mentions 'update' THEN category=shipping",
         "IF ticket mentions 'refund' THEN category=account",
-        "IF ticket mentions 'arrived' THEN category=technical",
-        "IF ticket mentions 'mobile' THEN category=feedback"
+        "IF ticket mentions 'order' THEN category=billing",
+        "IF ticket mentions 'falcon' THEN category=technical",
+        "IF ticket mentions 'new' THEN category=feedback",
+        "IF ticket mentions 'dark' THEN category=feedback",
+        "IF ticket mentions 'fantastic' THEN category=feedback",
+        "IF ticket mentions 'looks' THEN category=feedback",
+        "IF ticket mentions 'mode' THEN category=feedback",
+        "IF ticket mentions 'say' THEN category=feedback",
+        "IF ticket mentions 'wanted' THEN category=feedback",
+        "IF ticket mentions 'delivery' THEN category=billing"
       ]
     }
   },
   "headline": {
-    "convention_gap_last_session": 0.7142,
+    "convention_gap_last_session": 0.5714,
     "alone_convention_mean": 0.2286,
-    "mnemo_convention_mean": 0.4857
+    "mnemo_convention_mean": 0.4286
   }
 }

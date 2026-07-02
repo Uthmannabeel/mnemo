@@ -138,21 +138,32 @@ class Consolidator:
             return self._reflect_offline(episodes)
 
     # ------------------------------------------------------------- offline
+    # Evidence weighting: recent experience outweighs stale experience (gamma decay
+    # over episode order), and episodes where the agent was WRONG count double —
+    # mistakes are the most salient thing to learn from. This is what lets a changed
+    # org policy actually flip a rule instead of being outvoted by history forever.
+    _GAMMA = 0.96          # per-episode decay; half-weight after ~17 episodes
+    _MISTAKE_WEIGHT = 2.0  # corrected mispredictions carry extra evidence
+
     def _reflect_offline(self, episodes: list[MemoryRecord]) -> dict:
         """Statistical distiller: associate keywords with outcome categories."""
         kw_cat: dict[str, Counter] = defaultdict(Counter)
         kw_sources: dict[str, list[str]] = defaultdict(list)
         cat_counts: Counter = Counter()
 
-        for e in episodes:
+        n = len(episodes)
+        for i, e in enumerate(episodes):
             cat = e.attrs.get("category")
             if not cat:
                 continue
+            w = self._GAMMA ** (n - 1 - i)  # episodes arrive in chronological order
+            if e.attrs.get("correct") is False:
+                w *= self._MISTAKE_WEIGHT
             cat_counts[cat] += 1
             # sorted() so rule-creation order doesn't depend on set-iteration order
             # (PYTHONHASHSEED randomizes str hashing) — keeps the whole eval reproducible.
             for kw in sorted(set(_keywords(e.content))):
-                kw_cat[kw][cat] += 1
+                kw_cat[kw][cat] += w
                 if len(kw_sources[kw]) < 5:
                     kw_sources[kw].append(e.id)
 
@@ -161,7 +172,7 @@ class Consolidator:
             cats = kw_cat[kw]
             cat, hits = cats.most_common(1)[0]
             total = sum(cats.values())
-            if hits >= 2 and hits / total >= 0.75:  # strong, consistent signal
+            if hits >= 2.0 and hits / total >= 0.75:  # strong, consistent, current signal
                 conf = min(0.95, 0.5 + 0.1 * hits)
                 procedural.append({
                     "content": f"IF ticket mentions '{kw}' THEN category={cat}",

@@ -58,6 +58,7 @@ class TriageAgent:
             prediction={"category": category},
             used_memory_ids=[sm.record.id for sm in working],
             fired_memory_ids=self._fired_rules(ticket, working, category),
+            context_chars=sum(len(sm.record.content) for sm in working),
             rationale=rationale,
         )
 
