@@ -3,247 +3,430 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Mnemo — self-improving memory agent</title>
+<title>Mnemo — memory engine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="/static/chart.umd.min.js"></script>
 <script>if(!window.Chart){document.write('<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"><\/script>')}</script>
 <style>
   :root{
-    --bg:#0b0d12; --panel:#131722; --panel2:#1a2030; --line:#232a3b;
-    --ink:#e7ecf3; --dim:#8a94a7; --accent:#7c5cff; --good:#37d39b; --warn:#ffb454; --epi:#4aa8ff;
-    --font:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    --bg:#F6F7F8; --surface:#FFFFFF; --border:#E3E6EA; --border-strong:#C7CDD6;
+    --ink:#171A20; --muted:#5B6472; --faint:#8B94A3;
+    --accent:#2140C7; --accent-weak:#EEF1FC;
+    --good:#0E7B4F; --good-weak:#E9F5EF;
+    --bad:#B42318; --bad-weak:#FBEAE7;
+    --sans:'IBM Plex Sans',-apple-system,'Segoe UI',sans-serif;
+    --mono:'IBM Plex Mono',ui-monospace,'Cascadia Mono',Consolas,monospace;
   }
   *{box-sizing:border-box}
-  body{margin:0;background:radial-gradient(1200px 600px at 70% -10%,#191d2e 0,var(--bg) 55%);color:var(--ink);font-family:var(--font);}
-  header{padding:28px 32px 8px;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
-  header h1{margin:0;font-size:22px;letter-spacing:-.02em}
-  .badge{font-size:12px;color:var(--accent);border:1px solid var(--accent);padding:2px 9px;border-radius:999px}
-  .sub{color:var(--dim);font-size:13px}
-  .grid{display:grid;grid-template-columns:1.4fr 1fr;gap:18px;padding:16px 32px 40px}
+  html{-webkit-font-smoothing:antialiased}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:13.5px;line-height:1.5}
+  a{color:var(--accent);text-decoration:none}
+  a:hover{text-decoration:underline}
+  button{font-family:var(--sans);font-size:12.5px;font-weight:500;color:var(--ink);
+    background:var(--surface);border:1px solid var(--border-strong);border-radius:6px;
+    padding:6px 12px;cursor:pointer}
+  button:hover{border-color:var(--faint)}
+  button:disabled{opacity:.45;cursor:default}
+  button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+  button.primary:hover{background:#1B36AB}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  input{font-family:var(--sans);font-size:13.5px;color:var(--ink);background:var(--surface);
+    border:1px solid var(--border-strong);border-radius:6px;padding:8px 11px;width:100%}
+  input::placeholder{color:var(--faint)}
+  .mono{font-family:var(--mono);font-feature-settings:'tnum'}
+
+  /* ---------- frame ---------- */
+  .top{display:flex;align-items:center;gap:20px;padding:14px 28px;background:var(--surface);
+    border-bottom:1px solid var(--border)}
+  .wordmark{font-family:var(--mono);font-weight:600;font-size:14px;letter-spacing:.14em}
+  .wordmark span{color:var(--faint);font-weight:400;letter-spacing:0;margin-left:10px;font-size:12.5px;font-family:var(--sans)}
+  .env{margin-left:auto;display:flex;align-items:center;gap:14px;font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+  .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--good);margin-right:6px;vertical-align:1px}
+  .dot.off{background:var(--faint)}
+  .wrap{max-width:1180px;margin:0 auto;padding:20px 28px 48px}
+
+  /* ---------- system strip ---------- */
+  .strip{display:flex;align-items:center;gap:28px;background:var(--surface);border:1px solid var(--border);
+    border-radius:8px;padding:14px 20px;flex-wrap:wrap}
+  .stat{min-width:96px}
+  .stat b{display:block;font-family:var(--mono);font-size:20px;font-weight:500;line-height:1.2}
+  .stat span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em}
+  .strip .actions{margin-left:auto;display:flex;gap:8px;align-items:center}
+  .strip .note{width:100%;font-size:12px;color:var(--muted);padding-top:2px}
+  .strip .note:empty{display:none}
+
+  /* ---------- layout ---------- */
+  .grid{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:16px;margin-top:16px}
   @media(max-width:980px){.grid{grid-template-columns:1fr}}
-  .card{background:linear-gradient(180deg,var(--panel),#10141d);border:1px solid var(--line);border-radius:16px;padding:18px 20px}
-  .card h2{margin:0 0 4px;font-size:14px;letter-spacing:.02em;text-transform:uppercase;color:var(--dim)}
-  .card .hint{font-size:12px;color:var(--dim);margin-bottom:12px}
-  .stat{display:flex;gap:22px;margin:10px 0 4px}
-  .stat div b{font-size:22px} .stat div span{display:block;font-size:11px;color:var(--dim)}
-  button{background:var(--accent);color:#fff;border:0;padding:9px 16px;border-radius:10px;font-weight:600;cursor:pointer;font-family:var(--font)}
-  button.ghost{background:var(--panel2);border:1px solid var(--line)}
-  button:disabled{opacity:.5;cursor:default}
-  input{width:100%;background:var(--panel2);border:1px solid var(--line);color:var(--ink);border-radius:10px;padding:11px 12px;font-family:var(--font);font-size:14px}
-  .row{display:flex;gap:10px;align-items:center;margin-top:10px}
-  .pill{font-size:12px;padding:3px 10px;border-radius:999px;background:var(--panel2);border:1px solid var(--line);color:var(--dim)}
-  .cat{font-weight:700;color:var(--good);text-transform:capitalize}
-  .tiers{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
-  @media(max-width:640px){.tiers{grid-template-columns:1fr}}
-  .tier h3{margin:0 0 8px;font-size:12px;text-transform:uppercase;letter-spacing:.04em}
-  .tier.pro h3{color:var(--accent)} .tier.sem h3{color:var(--warn)} .tier.epi h3{color:var(--epi)}
-  .mem{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin-bottom:8px;font-size:12.5px;line-height:1.35}
-  .mem .meta{color:var(--dim);font-size:11px;margin-top:4px}
-  .prov{font-size:12px;color:var(--dim);margin-top:8px;max-height:120px;overflow:auto}
-  .prov .mem{margin-bottom:6px}
-  footer{color:var(--dim);font-size:12px;padding:0 32px 32px}
-  a{color:var(--accent)}
+  .panel{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:18px 20px}
+  .eyebrow{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.09em;
+    text-transform:uppercase;color:var(--ink)}
+  .eyebrow small{color:var(--faint);font-weight:400;letter-spacing:.02em;text-transform:none;
+    font-family:var(--sans);font-size:12px;margin-left:10px}
+  .rule{border:0;border-top:1px solid var(--border);margin:12px 0}
+
+  /* ---------- triage ---------- */
+  .ticketrow{display:flex;gap:8px;margin-top:12px}
+  .ticketrow button{white-space:nowrap}
+
+  /* the decision ledger — every triage becomes a numbered evidence trace */
+  .ledger{margin-top:16px}
+  .ledger .empty{color:var(--faint);font-size:12.5px;padding:18px 0 6px}
+
+  /* first-run primer: how the engine learns, plus one-click sample tickets */
+  .primer{margin-top:16px;border-top:1px solid var(--border);padding-top:14px}
+  .primer .how{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+  @media(max-width:700px){.primer .how{grid-template-columns:1fr}}
+  .how b{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.07em;text-transform:uppercase;margin-bottom:3px}
+  .how div{font-size:12px;color:var(--muted)}
+  .primer .try{margin-top:14px;font-size:11.5px;color:var(--faint)}
+  .chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+  .chips button{font-size:11.5px;padding:5px 10px;color:var(--muted);border-color:var(--border)}
+  .chips button:hover{color:var(--ink);border-color:var(--border-strong)}
+  .step{display:grid;grid-template-columns:34px 92px 1fr;gap:10px;padding:9px 0;
+    border-top:1px solid var(--border);align-items:baseline}
+  .step .idx{font-family:var(--mono);font-size:11px;color:var(--faint)}
+  .step .tag{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.06em;color:var(--muted)}
+  .step .body{font-size:13px;min-width:0}
+  .step.fired .tag{color:var(--accent)}
+  .step.fired .body{font-family:var(--mono);font-size:12px}
+  .step .body .conf{color:var(--faint);font-family:var(--mono);font-size:11.5px;margin-left:8px}
+  .decision-cat{font-family:var(--mono);font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+  .flash{animation:flash 1.2s ease-out 1}
+  @keyframes flash{0%{background:var(--accent-weak)}100%{background:transparent}}
+  @media(prefers-reduced-motion:reduce){.flash{animation:none}}
+
+  .teach{margin-top:4px;padding-top:12px;border-top:1px solid var(--border)}
+  .teach .q{font-size:12.5px;color:var(--muted);margin-bottom:8px}
+  .teach .opts{display:flex;gap:6px;flex-wrap:wrap}
+  .teach .verdict{margin-top:8px;font-size:12.5px}
+  .teach .verdict.ok{color:var(--good)}
+  .teach .verdict.fix{color:var(--bad)}
+
+  /* ---------- memory browser ---------- */
+  .tier{margin-top:14px}
+  .tier:first-of-type{margin-top:12px}
+  .tierhead{display:flex;align-items:baseline;gap:8px}
+  .tierhead .count{font-family:var(--mono);font-size:11px;color:var(--faint)}
+  .rec{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-top:1px solid var(--border)}
+  .rec:first-of-type{border-top:0}
+  .rec .txt{flex:1;min-width:0;font-size:12.5px;overflow:hidden;display:-webkit-box;
+    -webkit-line-clamp:2;-webkit-box-orient:vertical}
+  .rec .txt.mono{font-family:var(--mono);font-size:11.5px}
+  .rec .meta{flex-shrink:0;text-align:right;font-family:var(--mono);font-size:11px;color:var(--faint);line-height:1.7}
+  .meter{width:44px;height:3px;background:var(--border);border-radius:2px;display:inline-block;vertical-align:2px}
+  .meter i{display:block;height:3px;border-radius:2px;background:var(--accent)}
+  .tier .empty{color:var(--faint);font-size:12px;padding:8px 0}
+
+  /* ---------- evidence ---------- */
+  .evidence{margin-top:16px}
+  .charts{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:12px}
+  @media(max-width:980px){.charts{grid-template-columns:1fr}}
+  .chartcard{border:1px solid var(--border);border-radius:8px;padding:14px 16px}
+  .chartcard h3{margin:0;font-size:13px;font-weight:600}
+  .chartcard p{margin:3px 0 10px;font-size:12px;color:var(--muted)}
+  .chartwrap{position:relative;height:185px}
+  .chartcard .takeaway{margin:10px 0 0;font-size:12.5px;color:var(--ink)}
+  .chartcard .takeaway b{font-family:var(--mono);font-weight:600}
+  .method{margin-top:12px;font-size:11.5px;color:var(--faint)}
+  .method .mono{font-size:11px}
+
+  .foot{margin-top:28px;font-size:11.5px;color:var(--faint);display:flex;gap:18px;flex-wrap:wrap}
 </style>
 </head>
 <body>
-  <header>
-    <h1>Mnemo</h1>
-    <span class="badge">MemoryAgent · Qwen Cloud</span>
-    <span class="sub" id="hstatus">connecting…</span>
-  </header>
+
+<header class="top">
+  <div class="wordmark">MNEMO<span>memory engine for support triage</span></div>
+  <div class="env mono" id="env"><span class="dot off"></span>connecting</div>
+  <a class="mono" style="font-size:11.5px" href="https://github.com/Uthmannabeel/mnemo">source</a>
+</header>
+
+<div class="wrap">
+
+  <!-- system strip -->
+  <section class="strip" aria-label="memory state">
+    <div class="stat"><b class="mono" id="nEpi">–</b><span>episodes</span></div>
+    <div class="stat"><b class="mono" id="nSem">–</b><span>semantic facts</span></div>
+    <div class="stat"><b class="mono" id="nPro">–</b><span>procedural rules</span></div>
+    <div class="actions">
+      <button id="btnSeed">Seed sample workload</button>
+      <button id="btnDream">Consolidate now</button>
+    </div>
+    <div class="note" id="stripNote"></div>
+  </section>
 
   <div class="grid">
-    <!-- LEFT: the money-shot chart -->
-    <div class="card">
-      <h2>Decision accuracy across sessions</h2>
-      <div class="hint">Same tickets, same per-decision context budget. Memory is the only variable.</div>
-      <canvas id="chart" height="150"></canvas>
-      <div class="stat" id="statline"></div>
-      <div class="row">
-        <button id="runEval">▶ Run learning experiment</button>
-        <span class="pill" id="evalNote">3 arms · 8 sessions × 25 tickets</span>
-      </div>
-      <div class="hint" style="margin-top:10px">Benchmark runs on an isolated store with the deterministic
-        offline policy (reproducible, zero API cost). The live memory below is separate — seed it to explore.</div>
-    </div>
 
-    <!-- RIGHT: live triage -->
-    <div class="card">
-      <h2>Triage a ticket</h2>
-      <div class="hint">Watch the agent decide — and cite the memories that justified it.</div>
-      <input id="ticket" placeholder="e.g. I was charged twice, please refund the duplicate charge" />
-      <div class="row">
-        <button id="doTriage">Triage</button>
-        <span class="pill">predicted: <span class="cat" id="pred">—</span></span>
+    <!-- triage workbench -->
+    <section class="panel">
+      <div class="eyebrow">Triage<small>route a ticket, inspect the decision, teach the outcome</small></div>
+      <div class="ticketrow">
+        <input id="ticket" placeholder="Paste a support ticket — e.g. “I was charged twice, please refund the duplicate”" />
+        <button class="primary" id="btnTriage">Triage</button>
       </div>
-      <div id="rationale" class="hint" style="margin-top:10px"></div>
-      <div class="prov" id="prov"></div>
-      <div id="fbRow" style="display:none;margin-top:12px">
-        <div class="hint">Was this right? Confirm to teach Mnemo — this is how it learns:</div>
-        <div class="row" id="fbBtns" style="flex-wrap:wrap"></div>
-        <div class="hint" id="fbStatus" style="margin-top:6px"></div>
-      </div>
-    </div>
 
-    <!-- BOTTOM: live memory tiers -->
-    <div class="card" style="grid-column:1/-1">
-      <h2>Memory tiers (live)</h2>
-      <div class="hint">The Dreaming loop distils raw episodes (right) into semantic facts and procedural rules (left).</div>
-      <div class="row" style="margin:2px 0 14px">
-        <button id="doSeed" class="ghost">⚡ Seed demo data</button>
-        <button id="doDream" class="ghost">💤 Dream now</button>
-        <span class="hint" id="tierStatus"></span>
+      <div class="ledger" id="ledger">
+        <div class="primer" id="primer">
+          <div class="how">
+            <div><b>1 · Experience</b><div>Every routed ticket and its outcome is written to episodic memory.</div></div>
+            <div><b>2 · Consolidate</b><div>A background pass distils episodes into rules and facts — the Dreaming loop.</div></div>
+            <div><b>3 · Decide</b><div>New tickets are routed with those rules, and every decision cites its evidence.</div></div>
+          </div>
+          <div class="try">Try one:</div>
+          <div class="chips">
+            <button data-t="I was charged twice this month, please refund the duplicate payment.">Duplicate charge</button>
+            <button data-t="The app crashes with error 500 every time I upload a file.">Crash on upload</button>
+            <button data-t="My package tracking hasn't updated in five days, where is my order?">Late delivery</button>
+            <button data-t="I need to reset my password but the reset email never arrives.">Locked out</button>
+          </div>
+        </div>
       </div>
-      <div class="tiers">
-        <div class="tier pro"><h3 id="proCount">Procedural</h3><div id="pro"></div></div>
-        <div class="tier sem"><h3 id="semCount">Semantic</h3><div id="sem"></div></div>
-        <div class="tier epi"><h3 id="epiCount">Episodic</h3><div id="epi"></div></div>
+
+      <div class="teach" id="teach" hidden>
+        <div class="q">Right call? Confirming or correcting writes this outcome to memory.</div>
+        <div class="opts" id="teachOpts"></div>
+        <div class="verdict" id="verdict"></div>
       </div>
-    </div>
+    </section>
+
+    <!-- memory browser -->
+    <section class="panel">
+      <div class="eyebrow">Memory<small>what the engine currently believes</small></div>
+
+      <div class="tier">
+        <div class="tierhead"><span class="eyebrow" style="font-size:10.5px">Procedural</span><span class="count" id="cPro"></span></div>
+        <div id="listPro"><div class="empty">No rules yet.</div></div>
+      </div>
+      <div class="tier">
+        <div class="tierhead"><span class="eyebrow" style="font-size:10.5px">Semantic</span><span class="count" id="cSem"></span></div>
+        <div id="listSem"><div class="empty">No facts yet.</div></div>
+      </div>
+      <div class="tier">
+        <div class="tierhead"><span class="eyebrow" style="font-size:10.5px">Episodic</span><span class="count" id="cEpi"></span></div>
+        <div id="listEpi"><div class="empty">No episodes yet. Seed a sample workload, or teach from a triage.</div></div>
+      </div>
+    </section>
   </div>
 
-  <footer>Mnemo · four-tier cognitive memory · Qwen3.7-Max + Qwen embeddings on Alibaba Cloud · MIT</footer>
+  <!-- evidence -->
+  <section class="panel evidence">
+    <div class="eyebrow">Evidence<small>two controlled experiments, deterministic and enforced in CI</small></div>
+    <div class="charts">
+      <div class="chartcard">
+        <h3>1 · Memory architecture ablation</h3>
+        <p>Same tickets, same six-memory budget per decision. Memory is the only variable.</p>
+        <div class="chartwrap"><canvas id="chart1"></canvas></div>
+        <p class="takeaway" id="take1"></p>
+      </div>
+      <div class="chartcard">
+        <h3>2 · Organization conventions</h3>
+        <p>Tickets whose correct routing no model can know zero-shot — only learn from experience.</p>
+        <div class="chartwrap"><canvas id="chart2"></canvas></div>
+        <p class="takeaway" id="take2"></p>
+      </div>
+    </div>
+    <p class="method">Method: seeded synthetic workloads · identical retrieval budget across arms · results reproduce byte-for-byte offline
+      (<span class="mono">MNEMO_OFFLINE=1</span>) · invariants asserted in <a href="https://github.com/Uthmannabeel/mnemo/tree/main/backend/tests">tests</a>, run on every push.</p>
+  </section>
+
+  <footer class="foot">
+    <span>Qwen3.7-Max + Qwen embeddings via Alibaba Cloud Model Studio</span>
+    <span>pgvector on RDS for PostgreSQL</span>
+    <span>Dreaming consolidation on Function Compute</span>
+    <span style="margin-left:auto">MIT</span>
+  </footer>
+</div>
 
 <script>
 const API = location.origin;
-let chart;
+const CATS = ['billing','technical','account','shipping','feedback'];
+const $ = id => document.getElementById(id);
+let last = null;
 
+/* ---------- header ---------- */
 async function health(){
   try{
     const h = await (await fetch(API+'/health')).json();
-    document.getElementById('hstatus').textContent =
-      `${h.qwen_model} · ${h.mode} · store:${h.store}`;
-  }catch(e){ document.getElementById('hstatus').textContent = 'API offline'; }
+    const live = h.mode === 'qwen-live';
+    $('env').innerHTML = `<span class="dot${live?'':' off'}"></span>${h.qwen_model} · ${h.mode} · store:${h.store}`;
+  }catch(e){ $('env').innerHTML = '<span class="dot off"></span>api unreachable'; }
 }
 
-function drawChart(arms){
-  const labels = arms.full.accuracy_by_session.map((_,i)=>'S'+(i+1));
-  const ds = (arm,color,label)=>({
-    label, data:arms[arm].accuracy_by_session.map(v=>+(v*100).toFixed(0)),
-    borderColor:color, backgroundColor:color+'22', tension:.35, borderWidth:3,
-    pointRadius:3, fill:false
-  });
-  const cfg = {type:'line', data:{labels, datasets:[
-    ds('none','#8a94a7','No memory'),
-    ds('episodic','#4aa8ff','Episodic RAG'),
-    ds('full','#7c5cff','Mnemo'),
-  ]}, options:{
-    plugins:{legend:{labels:{color:'#e7ecf3'}}},
-    scales:{
-      y:{min:0,max:100,ticks:{color:'#8a94a7',callback:v=>v+'%'},grid:{color:'#232a3b'}},
-      x:{ticks:{color:'#8a94a7'},grid:{color:'#1a2030'}}
-    }
-  }};
-  if(chart) chart.destroy();
-  chart = new Chart(document.getElementById('chart'), cfg);
-  const f=arms.full, e=arms.episodic, n=arms.none;
-  document.getElementById('statline').innerHTML =
-    `<div><b style="color:#7c5cff">${(f.mean*100).toFixed(0)}%</b><span>Mnemo mean</span></div>`+
-    `<div><b style="color:#4aa8ff">${(e.mean*100).toFixed(0)}%</b><span>Episodic mean</span></div>`+
-    `<div><b style="color:#8a94a7">${(n.mean*100).toFixed(0)}%</b><span>No-memory mean</span></div>`+
-    `<div><b style="color:#37d39b">+${((f.mean-e.mean)*100).toFixed(0)} pts</b><span>Mnemo vs RAG</span></div>`;
+/* ---------- memory browser ---------- */
+function recRow(m, monoTxt){
+  const conf = Math.round(m.confidence*100);
+  const cat = m.attrs && m.attrs.category ? m.attrs.category : '';
+  return `<div class="rec">
+    <div class="txt${monoTxt?' mono':''}">${esc(m.content)}</div>
+    <div class="meta">${cat ? cat+'<br>' : ''}<span class="meter"><i style="width:${conf}%"></i></span> ${(m.confidence).toFixed(2)} · ×${m.use_count}</div>
+  </div>`;
 }
+function esc(s){ const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
 
-async function runEval(){
-  const b=document.getElementById('runEval'); b.disabled=true; b.textContent='Running…';
-  try{ const r = await (await fetch(API+'/eval',{method:'POST'})).json(); drawChart(r.arms); }
-  finally{ b.disabled=false; b.textContent='▶ Run learning experiment'; }
-}
-
-const CATEGORIES = ['billing','technical','account','shipping','feedback'];
-let lastTriage = null;
-
-function memCard(m){
-  const fired = m.fired ? ' <span style="color:var(--good);font-weight:700">● fired</span>' : '';
-  return `<div class="mem">${m.content}
-    <div class="meta">conf ${m.confidence} · used ${m.use_count}×${m.attrs&&m.attrs.category?' · '+m.attrs.category:''}${fired}</div></div>`;
-}
-const EMPTY_HINT = '<div class="hint">empty — click <b>⚡ Seed demo data</b>, or triage a ticket and confirm its category</div>';
-async function loadMemory(){
+async function refreshMemory(){
   try{
     const m = await (await fetch(API+'/memory')).json();
-    const set=(id,arr,countId,name)=>{
-      document.getElementById(id).innerHTML = (arr||[]).slice(0,8).map(memCard).join('') || EMPTY_HINT;
-      document.getElementById(countId).textContent = `${name} (${(arr||[]).length})`;
+    const pro = m.procedural||[], sem = m.semantic||[], epi = m.episodic||[];
+    $('nEpi').textContent = epi.length; $('nSem').textContent = sem.length; $('nPro').textContent = pro.length;
+    const fill = (listId, cId, arr, empty, monoTxt, n=6) => {
+      $(cId).textContent = arr.length ? `${arr.length} record${arr.length===1?'':'s'}` : '';
+      $(listId).innerHTML = arr.length
+        ? arr.slice().sort((a,b)=>b.confidence-a.confidence).slice(0,n).map(x=>recRow(x,monoTxt)).join('')
+        : `<div class="empty">${empty}</div>`;
     };
-    set('pro',m.procedural,'proCount','Procedural');
-    set('sem',m.semantic,'semCount','Semantic');
-    set('epi',m.episodic,'epiCount','Episodic');
+    fill('listPro','cPro',pro,'No rules yet.',true);
+    fill('listSem','cSem',sem,'No facts yet.',false,3);
+    fill('listEpi','cEpi',epi.slice(-40),'No episodes yet. Seed a sample workload, or teach from a triage.',false,3);
   }catch(e){}
 }
 
+/* ---------- triage + ledger ---------- */
+function step(i, tag, body, cls=''){
+  return `<div class="step ${cls}"><span class="idx">0${i}</span><span class="tag">${tag}</span><div class="body">${body}</div></div>`;
+}
 async function triage(){
-  const t=document.getElementById('ticket').value.trim(); if(!t) return;
-  const r = await (await fetch(API+'/triage',{method:'POST',headers:{'content-type':'application/json'},
-    body:JSON.stringify({ticket:t})})).json();
-  document.getElementById('pred').textContent = r.category;
-  document.getElementById('rationale').textContent = r.rationale || '';
-  document.getElementById('prov').innerHTML =
-    '<b>Why (provenance):</b>' + ((r.provenance||[]).map(memCard).join('') ||
-    ' <span class="hint">no memory used yet — the agent guessed. Teach it below.</span>');
-  lastTriage = {ticket: t, category: r.category, fired_memory_ids: r.fired_memory_ids||[], used_memory_ids: r.used_memory_ids||[]};
-  renderFeedback(r.category);
+  const t = $('ticket').value.trim(); if(!t) return;
+  $('btnTriage').disabled = true;
+  try{
+    const r = await (await fetch(API+'/triage',{method:'POST',headers:{'content-type':'application/json'},
+      body:JSON.stringify({ticket:t})})).json();
+    last = {ticket:t, category:r.category, fired:r.fired_memory_ids||[], used:r.used_memory_ids||[]};
+    const prov = r.provenance||[];
+    const fired = prov.filter(p=>p.fired);
+    const tiers = [...new Set(prov.map(p=>p.tier))].join(', ') || 'none';
+    let html = step(1,'RETRIEVED', prov.length
+      ? `${prov.length} memories under budget · tiers: ${tiers}`
+      : 'nothing — memory is empty, this will be a cold guess');
+    html += fired.length
+      ? fired.map(f=>step(2,'FIRED',`${esc(f.content)}<span class="conf">conf ${f.confidence.toFixed(2)}</span>`,'fired flash')).join('')
+      : step(2,'FIRED','no rule matched — decided from precedent' + (prov.length?'':' (none)'));
+    html += step(3,'DECISION',`<span class="decision-cat">${r.category}</span>&ensp;<span style="color:var(--muted)">${esc(r.rationale||'')}</span>`);
+    html += step(4,'TAUGHT','<span style="color:var(--faint)" id="taughtCell">awaiting your verdict below</span>');
+    $('ledger').innerHTML = html;
+    renderTeach(r.category);
+  } finally { $('btnTriage').disabled = false; }
 }
 
-function renderFeedback(predicted){
-  const row = document.getElementById('fbRow');
-  const btns = document.getElementById('fbBtns');
-  document.getElementById('fbStatus').textContent = '';
-  btns.innerHTML = '';
-  const ok = document.createElement('button');
-  ok.textContent = `✓ Correct (${predicted})`;
-  ok.onclick = () => sendFeedback(predicted);
-  btns.appendChild(ok);
-  for(const c of CATEGORIES){
-    if(c===predicted) continue;
+function renderTeach(predicted){
+  $('teach').hidden = false; $('verdict').textContent=''; $('verdict').className='verdict';
+  $('teachOpts').innerHTML = '';
+  const mk = (label, cat, primary) => {
     const b = document.createElement('button');
-    b.className = 'ghost'; b.textContent = c;
-    b.onclick = () => sendFeedback(c);
-    btns.appendChild(b);
-  }
-  row.style.display = 'block';
+    if(primary) b.className='primary';
+    b.textContent = label; b.onclick = ()=>teach(cat);
+    $('teachOpts').appendChild(b);
+  };
+  mk(`Confirm ${predicted}`, predicted, true);
+  CATS.filter(c=>c!==predicted).forEach(c=>mk(c,c,false));
 }
 
-async function sendFeedback(trueCat){
-  if(!lastTriage) return;
+async function teach(trueCat){
+  if(!last) return;
   const r = await (await fetch(API+'/feedback',{method:'POST',headers:{'content-type':'application/json'},
-    body:JSON.stringify({ticket:lastTriage.ticket, predicted_category:lastTriage.category,
-      true_category:trueCat, fired_memory_ids:lastTriage.fired_memory_ids,
-      used_memory_ids:lastTriage.used_memory_ids})})).json();
-  const learned = trueCat===lastTriage.category ? 'Reinforced ✓' : `Corrected → ${trueCat} ✓`;
-  document.getElementById('fbStatus').textContent =
-    `${learned} — episode written to memory` + (r.dreamed ? ` · Dreaming pass distilled ${r.dreamed.procedural||0} rule(s)` : '');
-  loadMemory();
+    body:JSON.stringify({ticket:last.ticket, predicted_category:last.category, true_category:trueCat,
+      fired_memory_ids:last.fired, used_memory_ids:last.used})})).json();
+  const ok = trueCat===last.category;
+  const v = $('verdict');
+  v.className = 'verdict ' + (ok?'ok':'fix');
+  v.textContent = (ok ? `Confirmed — rule confidence reinforced.` : `Corrected to ${trueCat} — episode saved, wrong rule penalized.`)
+    + (r.dreamed ? ` Consolidation ran: +${r.dreamed.procedural||0} rules.` : '');
+  const cell = $('taughtCell');
+  if(cell) cell.innerHTML = ok
+    ? `<span style="color:var(--good)">confirmed ${last.category}</span>`
+    : `<span style="color:var(--bad)">corrected → ${trueCat}</span>`;
+  refreshMemory();
 }
 
-async function dreamNow(){
-  const s = document.getElementById('tierStatus');
-  s.textContent = 'dreaming…';
-  const r = await (await fetch(API+'/consolidate',{method:'POST'})).json();
-  s.textContent = r.episodes
-    ? `💤 reflected on ${r.episodes} episode(s) → +${r.procedural} procedural, +${r.semantic} semantic`
-    : 'nothing new to consolidate — triage & confirm some tickets first';
-  loadMemory();
-}
-
-async function seedDemo(){
-  const s = document.getElementById('tierStatus');
-  const b = document.getElementById('doSeed');
-  b.disabled = true; s.textContent = 'seeding 25 tickets through the live agent…';
+/* ---------- strip actions ---------- */
+async function seed(){
+  $('btnSeed').disabled = true;
+  $('stripNote').textContent = 'Routing 25 sample tickets through the live agent…';
   try{
     const r = await (await fetch(API+'/seed',{method:'POST'})).json();
-    s.textContent = `⚡ seeded ${r.seeded} tickets (${r.correct} correct pre-learning) · dreamed → +${r.dreamed.procedural||0} rules`;
-  } finally { b.disabled = false; }
-  loadMemory();
+    $('stripNote').textContent =
+      `Seeded ${r.seeded} tickets (${r.correct} correct before learning) · consolidation distilled ${r.dreamed.procedural||0} rules and ${r.dreamed.semantic||0} facts.`;
+  } finally { $('btnSeed').disabled = false; refreshMemory(); }
+}
+async function dream(){
+  $('btnDream').disabled = true;
+  try{
+    const r = await (await fetch(API+'/consolidate',{method:'POST'})).json();
+    $('stripNote').textContent = r.episodes
+      ? `Consolidation reflected on ${r.episodes} new episodes → +${r.procedural} rules, +${r.semantic} facts.`
+      : 'Nothing new to consolidate — teach a few outcomes first.';
+  } finally { $('btnDream').disabled = false; refreshMemory(); }
 }
 
-document.getElementById('runEval').onclick = runEval;
-document.getElementById('doTriage').onclick = triage;
-document.getElementById('doDream').onclick = dreamNow;
-document.getElementById('doSeed').onclick = seedDemo;
-document.getElementById('ticket').addEventListener('keydown',e=>{if(e.key==='Enter')triage()});
+/* ---------- evidence charts ---------- */
+const endLabels = {
+  id:'endLabels',
+  afterDatasetsDraw(c){
+    const {ctx} = c;
+    ctx.save();
+    ctx.font = '600 10.5px "IBM Plex Mono", monospace';
+    c.data.datasets.forEach((ds,i)=>{
+      const meta = c.getDatasetMeta(i); const p = meta.data[meta.data.length-1]; if(!p) return;
+      ctx.fillStyle = ds.borderColor;
+      ctx.fillText(ds.label, Math.min(p.x+6, c.chartArea.right-58), p.y+3.5);
+    });
+    ctx.restore();
+  }
+};
+function lineOpts(){
+  return {
+    responsive:true, maintainAspectRatio:false, animation:false,
+    layout:{padding:{right:64}},
+    plugins:{legend:{display:false}, tooltip:{displayColors:false}},
+    scales:{
+      y:{min:0,max:100,ticks:{color:'#8B94A3',font:{family:'IBM Plex Mono',size:10},callback:v=>v+'%',stepSize:25},
+         grid:{color:'#EDEFF2'},border:{display:false}},
+      x:{ticks:{color:'#8B94A3',font:{family:'IBM Plex Mono',size:10}},grid:{display:false},border:{color:'#E3E6EA'}}
+    },
+    elements:{point:{radius:2.5,hoverRadius:4},line:{tension:0,borderWidth:2}}
+  };
+}
+const pct = a => a.map(v=>Math.round(v*100));
 
-health(); runEval(); loadMemory();
-setInterval(loadMemory, 4000);
+async function evidence(){
+  try{
+    const [r1,r2] = await Promise.all([
+      (await fetch(API+'/eval',{method:'POST'})).json(),
+      (await fetch(API+'/eval2',{method:'POST'})).json(),
+    ]);
+    const labels1 = r1.arms.full.accuracy_by_session.map((_,i)=>'S'+(i+1));
+    new Chart($('chart1'),{type:'line',plugins:[endLabels],options:lineOpts(),data:{labels:labels1,datasets:[
+      {label:'no memory', data:pct(r1.arms.none.accuracy_by_session), borderColor:'#C1C7CF', backgroundColor:'#C1C7CF'},
+      {label:'episodic',  data:pct(r1.arms.episodic.accuracy_by_session), borderColor:'#7A8494', backgroundColor:'#7A8494'},
+      {label:'mnemo',     data:pct(r1.arms.full.accuracy_by_session), borderColor:'#2140C7', backgroundColor:'#2140C7'},
+    ]}});
+    const f=r1.arms.full, e=r1.arms.episodic;
+    $('take1').innerHTML = `Distilled rules beat raw retrieval under the same budget: <b>${Math.round(f.mean*100)}%</b> vs <b>${Math.round(e.mean*100)}%</b> mean, <b>${Math.round(f.last*100)}%</b> by the final session.`;
+
+    const a2 = r2.arms['qwen-alone'].per_session, m2 = r2.arms['qwen+mnemo'].per_session;
+    const labels2 = m2.map(s=>'S'+s.session);
+    new Chart($('chart2'),{type:'line',plugins:[endLabels],options:lineOpts(),data:{labels:labels2,datasets:[
+      {label:'zero-shot', data:a2.map(s=>Math.round(s.convention_acc*100)), borderColor:'#C1C7CF', backgroundColor:'#C1C7CF'},
+      {label:'with mnemo',data:m2.map(s=>Math.round(s.convention_acc*100)), borderColor:'#2140C7', backgroundColor:'#2140C7'},
+    ]}});
+    const h2 = r2.headline;
+    $('take2').innerHTML = `On convention tickets the zero-shot arm never improves; with memory the same model reaches <b>${Math.round(r2.arms['qwen+mnemo'].convention_last*100)}%</b> — a <b>+${Math.round(h2.convention_gap_last_session*100)} pt</b> final-session gap${r2.mode==='live-qwen'?'':' (offline pipeline validation; live run: <span class="mono">app.eval.live_harness --yes</span>)'}.`;
+  }catch(e){}
+}
+
+/* ---------- wire up ---------- */
+$('btnTriage').onclick = triage;
+$('ticket').addEventListener('keydown', e=>{ if(e.key==='Enter') triage(); });
+document.querySelectorAll('.chips button').forEach(b=>{
+  b.onclick = ()=>{ $('ticket').value = b.dataset.t; triage(); };
+});
+$('btnSeed').onclick = seed;
+$('btnDream').onclick = dream;
+
+health(); refreshMemory(); evidence();
+setInterval(refreshMemory, 5000);
 </script>
 </body>
 </html>

@@ -13,8 +13,8 @@ the architecture that earns it, then prove it runs on Alibaba Cloud.
 
 Show the dashboard hero: the three-line accuracy chart already rendered.
 
-### 0:20–1:00 — The proof (dashboard, click "Run learning experiment")
-- Point at the three lines as they draw:
+### 0:20–1:00 — The proof (console, Evidence section — both charts load on page open)
+- Point at the three lines of Experiment 1:
   > "Same support tickets, same context budget per decision. The only difference is
   > memory. No-memory stays at chance — 21%. Classic episodic RAG climbs to 60%.
   > Mnemo hits 71% mean, 100% by the last session."

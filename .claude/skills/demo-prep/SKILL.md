@@ -18,16 +18,17 @@ uvicorn app.api:app --port 8000
 ```
 Open http://localhost:8000.
 
-## 2. Seed memory so tiers + provenance are non-empty
-Click **⚡ Seed demo data** on the dashboard (or `curl -X POST http://localhost:8000/seed`).
-This runs 25 synthetic tickets through the live agent + one Dreaming pass, so the tiers
-panel fills up and triage provenance shows real distilled rules with **● fired** badges.
-Then triage a ticket, click a feedback button, and watch the episodic count tick up —
-that's the learning loop on camera.
+## 2. Seed memory so the browser + ledger are non-empty
+Click **Seed sample workload** on the console (or `Invoke-RestMethod -Method Post http://localhost:8000/seed`).
+This routes 25 synthetic tickets through the live agent + one consolidation pass, so the
+memory browser fills with real distilled rules. Then click a sample-ticket chip, watch
+the decision ledger cite a FIRED rule, and confirm/correct it — that's the learning
+loop on camera.
 
-## 3. Pre-warm the chart
-Click **Run learning experiment** once before filming so Chart.js is loaded and layout
-is stable, then re-run it on camera for the reveal (the 20%→100% Mnemo climb).
+## 3. Pre-warm the evidence charts
+Load the page once before filming — both experiment charts compute and cache on first
+load, so on camera they render instantly (Exp 1: the 20%→100% Mnemo climb; Exp 2: the
+convention gap Qwen can't close alone).
 
 ## 4. Shot list
 Follow `docs/DEMO_SCRIPT.md`. Order that lands best on camera:

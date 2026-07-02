@@ -46,9 +46,17 @@ def _estimate_calls(n_sessions: int, per_session: int) -> int:
 
 
 def run_experiment(
-    n_sessions: int = 5, per_session: int = 15, seed: int = 11, out: str | None = None
+    n_sessions: int = 5,
+    per_session: int = 15,
+    seed: int = 11,
+    out: str | None = None,
+    force_offline: bool = False,
 ) -> dict:
-    qwen = get_qwen()
+    """force_offline pins the deterministic mock client — used by the dashboard's
+    /eval2 endpoint so a page view can never spend API credits (same policy as /eval)."""
+    from ..qwen_client import QwenClient
+
+    qwen = QwenClient(force_offline=True) if force_offline else get_qwen()
     result: dict = {
         "experiment": "org-conventions: qwen-alone vs qwen+mnemo",
         "mode": "offline-pipeline-test" if qwen.offline else "live-qwen",
@@ -60,7 +68,7 @@ def run_experiment(
     }
 
     for mode, label in ARMS:
-        manager = MemoryManager(store=InMemoryStore())
+        manager = MemoryManager(store=InMemoryStore(), qwen=qwen)
         agent = TriageAgent(manager, mode=mode)
         consolidator = Consolidator(manager)
         sessions = make_org_sessions(n_sessions, per_session, seed)

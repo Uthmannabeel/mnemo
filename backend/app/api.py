@@ -159,3 +159,19 @@ def eval_run(sessions: int = 8, per_session: int = 25, seed: int = 7) -> dict:
     if key not in _eval_cache:
         _eval_cache[key] = run(sessions, per_session, seed)
     return _eval_cache[key]
+
+
+_eval2_cache: dict[tuple[int, int, int], dict] = {}
+
+
+@app.post("/eval2")
+def eval2_run(sessions: int = 5, per_session: int = 15, seed: int = 11) -> dict:
+    """Experiment 2 (org conventions) for the dashboard chart. Always the deterministic
+    offline pipeline + cached — same zero-credit policy as /eval. The live Qwen run is
+    the CLI's job (`python -m app.eval.live_harness --yes`)."""
+    from .eval.live_harness import run_experiment
+
+    key = (sessions, per_session, seed)
+    if key not in _eval2_cache:
+        _eval2_cache[key] = run_experiment(sessions, per_session, seed, force_offline=True)
+    return _eval2_cache[key]
