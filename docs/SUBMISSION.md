@@ -65,9 +65,9 @@ the Dreaming loop to Qwen3.7-Max's thousand-step long-horizon execution.
 `python` · `qwen3.7-max` · `dashscope` · `qwen-embeddings` · `fastapi` · `pgvector` ·
 `alibaba-cloud-rds` · `alibaba-cloud-function-compute` · `chart.js`
 
-## Links (fill in)
-- Repo: <github url, MIT license>
-- Demo video (~3 min): <youtube url>
-- Live dashboard: <alibaba cloud url>
-- Proof-of-deployment recording: <url>
-- Architecture diagram: see README (mermaid) / <image url>
+## Links
+- Repo: https://github.com/Uthmannabeel/mnemo (MIT license)
+- Architecture diagram: docs/architecture.svg + docs/architecture.png (Devpost gallery)
+- Demo video (~3 min): <youtube url — fill in>
+- Live dashboard: <alibaba cloud url — fill in>
+- Proof-of-deployment recording: <url — fill in>
