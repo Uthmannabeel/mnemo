@@ -1,0 +1,33 @@
+{
+  "permissions": {
+    "allow": [
+      "Edit",
+      "Write",
+      "Read"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"C:\\Users\\Nabeel Uthman\\mnemo\\.claude\\hooks\\protect-secrets.ps1\""
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"C:\\Users\\Nabeel Uthman\\mnemo\\.claude\\hooks\\test-guardian.ps1\""
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,185 @@
+# Mnemo — a self-improving memory agent
+
+> **Global AI Hackathon with Qwen Cloud — Track: MemoryAgent**
+> An agent with a human-like, four-tier memory that autonomously accumulates
+> experience and makes **measurably** more accurate decisions across sessions.
+
+<p align="center"><img src="docs/architecture.svg" alt="Mnemo architecture" width="880"></p>
+
+Most "memory agents" are a chatbot bolted to a vector database. Mnemo is a
+**cognitive memory architecture**: raw experience flows in as episodes, and an
+autonomous *Dreaming* loop — powered by **Qwen3.7-Max** — reflects on that
+experience and distils it into durable **semantic facts** and **procedural rules**
+that steer future decisions. We don't just claim it learns; we **prove it** with a
+controlled three-arm experiment.
+
+---
+
+## The result (this is the whole point)
+
+Support-ticket triage, 8 sessions × 25 tickets, identical tickets and identical
+per-decision context budget across all three arms:
+
+```
+session:      1    2    3    4    5    6    7    8
+no-memory     28   24   16   12   24   24   16   24   mean  21%   (≈ chance for 5 classes)
+episodic      28   68   60   56   72   52   68   80   mean  60%   (raw-RAG baseline)
+MNEMO         20   76   72   72   88   56   84  100   mean  71%   (episodic + Dreaming)
+```
+
+- **No-memory** never learns — flat at chance.
+- **Episodic RAG** (retrieve past tickets) helps, but noisy raw context caps it.
+- **Mnemo** distils experience into high-signal rules and, under the
+  **same finite context budget**, converges faster and higher (**+10.5 pts mean**,
+  **100% by session 8**).
+
+Reproduce it in ~2 seconds, no API key required:
+
+```bash
+# macOS / Linux
+cd backend && pip install -r requirements.txt
+MNEMO_OFFLINE=1 python -m app.eval.harness
+```
+```powershell
+# Windows (PowerShell)
+cd backend; pip install -r requirements.txt
+$env:MNEMO_OFFLINE=1; python -m app.eval.harness
+```
+
+> Offline mode uses a deterministic heuristic + hashing embeddings so the pipeline
+> and experiment run anywhere. With `DASHSCOPE_API_KEY` set, the exact same code
+> path runs **Qwen3.7-Max** for reasoning and **Qwen embeddings** for retrieval.
+
+---
+
+## Experiment 2 — does memory help *Qwen itself*?
+
+The fair challenge to any memory agent: *"wouldn't a frontier model ace this
+zero-shot, no memory needed?"* On generic tickets — yes. So Experiment 2 uses tickets
+whose ground truth depends on **organization conventions no model can know a priori**:
+
+| Signal in ticket | Surface reading | Northwind's actual routing |
+|---|---|---|
+| "Project Falcon" | billing / account / shipping | **technical** (white-glove team owns all Falcon tickets) |
+| refund request | billing | **account** (policy: refunds via account managers) |
+| Acme + sync issue | technical | **shipping** (known shipping-feed bug) |
+| beta-build report | technical | **feedback** (beta reports → product team) |
+| purchase-order question | shipping | **billing** (the PO desk) |
+
+Two arms, same tickets: **Qwen3.7-Max zero-shot** vs **Qwen3.7-Max + Mnemo memory**
+(Dreaming consolidation between sessions). Zero-shot stays wrong on conventions
+forever — however smart the model, it can't know your org. The memory arm learns them
+from feedback:
+
+```bash
+python -m app.eval.live_harness          # free offline pipeline test
+python -m app.eval.live_harness --yes    # live Qwen3.7-Max run (~160 calls), results
+                                         # checkpointed to results/org_experiment.json
+```
+
+Offline pipeline validation (deterministic mock, same code path): the memory arm's
+convention accuracy climbs **14% → 86%** across 5 sessions while the no-memory arm
+stays flat — and all five conventions are distilled into correct procedural rules
+(asserted by `tests/test_org_learning.py`). The committed `results/` JSON from the
+live run includes every prediction for auditability.
+
+> **The claim, precisely:** frontier models can't know your organization.
+> Mnemo makes Qwen3.7-Max learn it — measurably.
+
+---
+
+## Architecture
+
+```mermaid
+flowchart TB
+    subgraph Ingest
+        T[Incoming ticket] --> A[TriageAgent]
+    end
+
+    A -->|retrieve, finite budget| R{{Blended working set<br/>procedural + semantic + episodic}}
+    R --> D[Decision + provenance]
+    D -->|Qwen3.7-Max reasons over memory| A
+    D --> O[(Outcome / feedback)]
+    O -->|write raw experience| EP[(Episodic memory<br/>pgvector)]
+
+    subgraph Dreaming[Dreaming loop · Alibaba Cloud Function Compute cron]
+        EP -->|reflect · Qwen3.7-Max| C[Consolidator]
+        C -->|distil facts| SE[(Semantic memory)]
+        C -->|distil rules| PR[(Procedural memory)]
+        C -->|decay · conflict-resolve| PR
+    end
+
+    SE --> R
+    PR --> R
+
+    classDef qwen fill:#6b46c1,color:#fff;
+    class A,C qwen;
+```
+
+**Four tiers (modelled on human memory):**
+
+| Tier | Holds | Written by | Read for |
+|------|-------|-----------|----------|
+| **Working** | current session scratchpad | the live turn | in-context reasoning |
+| **Episodic** | raw timestamped events | every decision + outcome | grounding, source of truth |
+| **Semantic** | distilled facts & preferences | Dreaming loop | fast high-signal context |
+| **Procedural** | learned `IF signal THEN action` rules | Dreaming loop | steering decisions |
+
+**Retrieval** blends tiers and re-ranks by
+`0.6·similarity + 0.15·recency(decay) + 0.15·importance + 0.10·confidence`, so
+memories decay if unused and strengthen when they prove useful.
+
+**Autonomy & maturity:** the Dreaming loop runs unattended (a scheduled Function
+Compute job). It performs **credit assignment** (rules that drove correct calls gain
+confidence, wrong ones lose it and eventually deactivate), **conflict resolution**
+(a refined rule supersedes an outdated one instead of duplicating), and **decay**
+(unused memories fade). Every decision is **explainable** — it cites the exact
+memory ids that justified it.
+
+---
+
+## Qwen Cloud usage
+
+- **Qwen3.7-Max** via the DashScope **OpenAI-compatible** endpoint for triage
+  reasoning (function-calling ready) and for the reflection/consolidation step,
+  using `preserve_thinking` to keep reasoning context coherent across turns.
+- **Qwen embeddings** (`text-embedding-v4`) for the episodic vector index.
+- Deployed on **Alibaba Cloud**: FastAPI on ECS/Function Compute, **pgvector on
+  RDS for PostgreSQL**, Dreaming loop as a scheduled Function Compute trigger.
+
+See [`docs/DEPLOY.md`](docs/DEPLOY.md) for the Alibaba Cloud deployment.
+
+---
+
+## Repo layout
+
+```
+backend/
+  app/
+    qwen_client.py        Qwen/DashScope wrapper (+ deterministic offline mock)
+    memory/
+      types.py            tiered memory data model
+      store.py            InMemoryStore + pgvector PostgresStore
+      manager.py          retrieval, decay, provenance, promotion
+      consolidation.py    the Dreaming loop (online Qwen + offline distiller)
+    agent/triage.py       the triage agent that thinks with memory
+    eval/                 datasets + Experiment 1 (3-arm ablation) + Experiment 2
+                          (org conventions: qwen-alone vs qwen+mnemo, live harness)
+    api.py                FastAPI surface (deployable)
+    static/index.html     dashboard: live tiers + 3-arm accuracy chart (served by API)
+  tests/test_learning.py  regression test: memory improves accuracy
+docs/DEPLOY.md            Alibaba Cloud deployment guide
+```
+
+## Run the API locally
+
+```bash
+cd backend && pip install -r requirements.txt
+cp .env.example .env      # add DASHSCOPE_API_KEY for live Qwen, or leave offline
+uvicorn app.api:app --reload
+# open http://localhost:8000  → the dashboard (accuracy chart, live triage, memory tiers)
+```
+
+## License
+
+MIT — see [LICENSE](LICENSE).

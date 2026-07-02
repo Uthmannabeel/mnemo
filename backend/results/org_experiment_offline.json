@@ -1,0 +1,1163 @@
+{
+  "experiment": "org-conventions: qwen-alone vs qwen+mnemo",
+  "mode": "offline-pipeline-test",
+  "model": "qwen3.7-max",
+  "sessions": 5,
+  "per_session": 15,
+  "seed": 11,
+  "arms": {
+    "qwen-alone": {
+      "per_session": [
+        {
+          "session": 1,
+          "convention_acc": 0.2857,
+          "plain_acc": 0.25
+        },
+        {
+          "session": 2,
+          "convention_acc": 0.4286,
+          "plain_acc": 0.375
+        },
+        {
+          "session": 3,
+          "convention_acc": 0.1429,
+          "plain_acc": 0.125
+        },
+        {
+          "session": 4,
+          "convention_acc": 0.1429,
+          "plain_acc": 0.25
+        },
+        {
+          "session": 5,
+          "convention_acc": 0.1429,
+          "plain_acc": 0.125
+        }
+      ],
+      "predictions": [
+        {
+          "session": 1,
+          "ticket": "I've been a customer for three years now and generally really enjoy the service. Hoping we can sort this out quickly as it's a bit time sensitive. Hello team, Requesting a refund \u2014 I was billed again after cancelling. Thanks.",
+          "truth": "account",
+          "predicted": "billing",
+          "convention": true
+        },
+        {
+          "session": 1,
+          "ticket": "I've been a customer for three years now and generally really enjoy the service. Sorry to bother you, I know your team is busy and doing great work. Hello team, The app crashes every time I try to upload a file, error code 500. -- a frustrated user",
+          "truth": "technical",
+          "predicted": "shipping",
+          "convention": false
+        },
+        {
+          "session": 1,
+          "ticket": "I've been a customer for three years now and generally really enjoy the service. Quick one \u2014 The Acme integration sync throws timeout errors all morning. -- a frustrated user",
+          "truth": "shipping",
+          "predicted": "feedback",
+          "convention": true
+        },
+        {
+          "session": 1,
+          "ticket": "I've been a customer for three years now and generally really enjoy the service. Quick one \u2014 Why did my monthly payment go up? I want a breakdown of the new pricing.",
+          "truth": "billing",
+          "predicted": "billing",
+          "convention": false
+        },
+        {
+          "session": 1,
+          "ticket": "I tried searching the help center first but couldn't find a clear answer. Please process a refund for the duplicate payment on my invoice. Please advise. I've been a customer for three years now and generally really enjoy the service.",
+          "truth": "account",
+          "predicted": "feedback",
+          "convention": true
+        },
+        {
+          "session": 1,
+          "ticket": "FYI, A suggestion: it would be great to have keyboard shortcuts for navigation. Thanks. I've been a customer for three years now and generally really enjoy the service. My colleague suggested I contact support directly about this.",
+          "truth": "feedback",
+          "predicted": "billing",
+          "convention": false
+        },
+        {
+          "session": 1,
+          "ticket": "Quick one \u2014 Tracking hasn't updated for the purchase order we placed last week. -- a frustrated user This is my second time reaching out about something this month.",
+          "truth": "billing",
+          "predicted": "feedback",
+          "convention": true
+        },
+        {
+          "session": 1,
+          "ticket": "My colleague suggested I contact support directly about this. Quick one \u2014 The app crashes every time I try to upload a file, error code 500. Please advise. I've been a customer for three years now and generally really enjoy the service.",
+          "truth": "technical",
+          "predicted": "technical",
+          "convention": false
+        },
+        {
+          "session": 1,
+          "ticket": "For context, I'm on the annual plan and use the product daily for work. The hardware kit for our Project Falcon pilot hasn't arrived, tracking is stuck. This is my second time reaching out about something this month.",
+          "truth": "technical",
+          "predicted": "technical",
+          "convention": true
+        },
+        {
+          "session": 1,
+          "ticket": "Feature request \u2014 please add CSV import to the dashboard. This is my second time reaching out about something this month.",
+          "truth": "feedback",
+          "predicted": "technical",
+          "convention": false
+        },
+        {
+          "session": 1,
+          "ticket": "Urgent: The hardware kit for our Project Falcon pilot hasn't arrived, tracking is stuck. Please advise. This is my second time reaching out about something this month. Sorry to bother you, I know your team is busy and doing great work.",
+          "truth": "technical",
+          "predicted": "billing",
+          "convention": true
+        },
+        {
+          "session": 1,
+          "ticket": "I've been a customer for three years now and generally really enjoy the service. My colleague suggested I contact support directly about this. Urgent: I need to reset my password but the reset email never arrives. Appreciate the help.",
+          "truth": "account",
+          "predicted": "feedback",
+          "convention": false
+        },
+        {
+          "session": 1,
+          "ticket": "Hoping we can sort this out quickly as it's a bit time sensitive. Sorry to bother you, I know your team is busy and doing great work. The app crashes every time I try to upload a file, error code 500.",
+          "truth": "technical",
+          "predicted": "billing",
+          "convention": false
+        },
+        {
+          "session": 1,
+          "ticket": "This is my second time reaching out about something this month. I've been a customer for three years now and generally really enjoy the service. I want to delete my account and remove all my personal data. Appreciate the help.",
+          "truth": "account",
+          "predicted": "technical",
+          "convention": false
+        },
+        {
+          "session": 1,
+          "ticket": "Found a crash in the beta build when exporting reports. Thanks. I've been a customer for three years now and generally really enjoy the service.",
+          "truth": "feedback",
+          "predicted": "feedback",
+          "convention": true
+        },
+        {
+          "session": 2,
+          "ticket": "FYI, I love the product but wish the mobile app had offline support. Not sure if this is the right channel but figured I'd ask anyway.",
+          "truth": "feedback",
+          "predicted": "feedback",
+          "convention": false
+        },
+        {
+          "session": 2,
+          "ticket": "Sorry to bother you, I know your team is busy and doing great work. Quick one \u2014 When will the items on our purchase order arrive at the depot?",
+          "truth": "billing",
+          "predicted": "account",
+          "convention": true
+        },
+        {
+          "session": 2,
+          "ticket": "I've been a customer for three years now and generally really enjoy the service. Quick one \u2014 Beta build 2.3 keeps logging me out mid-session. Please advise.",
+          "truth": "feedback",
+          "predicted": "technical",
+          "convention": true
+        },
+        {
+          "session": 2,
+          "ticket": "I've been a customer for three years now and generally really enjoy the service. Hello team, Acme here \u2014 sync between the app and our warehouse feed is broken again. Thanks.",
+          "truth": "shipping",
+          "predicted": "shipping",
+          "convention": true
+        },
+        {
+          "session": 2,
+          "ticket": "Hi, Please add two admin users to our Project Falcon workspace. Please advise. Hoping we can sort this out quickly as it's a bit time sensitive. My colleague suggested I contact support directly about this.",
+          "truth": "technical",
+          "predicted": "technical",
+          "convention": true
+        },
+        {
+          "session": 2,
+          "ticket": "I've been a customer for three years now and generally really enjoy the service. FYI, I received a damaged item in my shipment, need a replacement sent. Appreciate the help.",
+          "truth": "shipping",
+          "predicted": "shipping",
+          "convention": false
+        },
+        {
+          "session": 2,
+          "ticket": "I cancelled last week but was still charged for a renewal today. Appreciate the help. This is my second time reaching out about something this month. Not sure if this is the right channel but figured I'd ask anyway.",
+          "truth": "billing",
+          "predicted": "billing",
+          "convention": false
+        },
+        {
+          "session": 2,
+          "ticket": "FYI, Please process a refund for the duplicate payment on my invoice. This is my second time reaching out about something this month.",
+          "truth": "account",
+          "predicted": "shipping",
+          "convention": true
+        },
+        {
+          "session": 2,
+          "ticket": "This is my second time reaching out about something this month. Hi, The Acme integration sync throws timeout errors all morning. Thanks. My colleague suggested I contact support directly about this.",
+          "truth": "shipping",
+          "predicted": "shipping",
+          "convention": true
+        },
+        {
+          "session": 2,
+          "ticket": "I tried searching the help center first but couldn't find a clear answer. I've been a customer for three years now and generally really enjoy the service. FYI, My package was supposed to arrive yesterday but the tracking hasn't updated. Appreciate the help.",
+          "truth": "shipping",
+          "predicted": "account",
+          "convention": false
+        },
+        {
+          "session": 2,
+          "ticket": "Quick one \u2014 I cancelled last week but was still charged for a renewal today. I've been a customer for three years now and generally really enjoy the service. My colleague suggested I contact support directly about this.",
+          "truth": "billing",
+          "predicted": "feedback",
+          "convention": false
+        },
+        {
+          "session": 2,
+          "ticket": "Hi, The new beta dashboard breaks on mobile, thought you should know. -- a frustrated user My colleague suggested I contact support directly about this.",
+          "truth": "feedback",
+          "predicted": "account",
+          "convention": true
+        },
+        {
+          "session": 2,
+          "ticket": "I've been a customer for three years now and generally really enjoy the service. Hello team, Getting a 'connection timed out' error whenever I open the reports tab. -- a frustrated user",
+          "truth": "technical",
+          "predicted": "billing",
+          "convention": false
+        },
+        {
+          "session": 2,
+          "ticket": "For context, I'm on the annual plan and use the product daily for work. I've been a customer for three years now and generally really enjoy the service. FYI, I cancelled last week but was still charged for a renewal today. Please advise.",
+          "truth": "billing",
+          "predicted": "account",
+          "convention": false
+        },
+        {
+          "session": 2,
+          "ticket": "Hello team, Sync is broken between my phone and laptop, changes don't propagate. -- a frustrated user Sorry to bother you, I know your team is busy and doing great work.",
+          "truth": "technical",
+          "predicted": "feedback",
+          "convention": false
+        },
+        {
+          "session": 3,
+          "ticket": "I tried searching the help center first but couldn't find a clear answer. Hoping we can sort this out quickly as it's a bit time sensitive. Quick one \u2014 The app crashes every time I try to upload a file, error code 500. -- a frustrated user",
+          "truth": "technical",
+          "predicted": "feedback",
+          "convention": false
+        },
+        {
+          "session": 3,
+          "ticket": "I've been a customer for three years now and generally really enjoy the service. Sorry to bother you, I know your team is busy and doing great work. Hi, I received a damaged item in my shipment, need a replacement sent.",
+          "truth": "shipping",
+          "predicted": "feedback",
+          "convention": false
+        },
+        {
+          "session": 3,
+          "ticket": "Not sure if this is the right channel but figured I'd ask anyway. Sorry to bother you, I know your team is busy and doing great work. Why did my monthly payment go up? I want a breakdown of the new pricing. -- a frustrated user",
+          "truth": "billing",
+          "predicted": "account",
+          "convention": false
+        },
+        {
+          "session": 3,
+          "ticket": "For context, I'm on the annual plan and use the product daily for work. Hello team, The hardware kit for our Project Falcon pilot hasn't arrived, tracking is stuck.",
+          "truth": "technical",
+          "predicted": "feedback",
+          "convention": true
+        },
+        {
+          "session": 3,
+          "ticket": "This is my second time reaching out about something this month. Sorry to bother you, I know your team is busy and doing great work. Quick one \u2014 Our Acme account isn't syncing orders since yesterday's update. Thanks.",
+          "truth": "shipping",
+          "predicted": "billing",
+          "convention": true
+        },
+        {
+          "session": 3,
+          "ticket": "Hi, My invoice shows a charge I don't recognize \u2014 can you explain this billing line? Please advise. For context, I'm on the annual plan and use the product daily for work.",
+          "truth": "billing",
+          "predicted": "technical",
+          "convention": false
+        },
+        {
+          "session": 3,
+          "ticket": "My colleague suggested I contact support directly about this. FYI, Can I get a refund on the annual renewal that just went through? Appreciate the help.",
+          "truth": "account",
+          "predicted": "account",
+          "convention": true
+        },
+        {
+          "session": 3,
+          "ticket": "Hello team, My account got locked after too many login attempts, please unlock it. Appreciate the help. I tried searching the help center first but couldn't find a clear answer.",
+          "truth": "account",
+          "predicted": "account",
+          "convention": false
+        },
+        {
+          "session": 3,
+          "ticket": "FYI, Why did my monthly payment go up? I want a breakdown of the new pricing. Please advise. Hoping we can sort this out quickly as it's a bit time sensitive.",
+          "truth": "billing",
+          "predicted": "shipping",
+          "convention": false
+        },
+        {
+          "session": 3,
+          "ticket": "Hoping we can sort this out quickly as it's a bit time sensitive. This is my second time reaching out about something this month. Urgent: Need a pricing breakdown for the Project Falcon add-on seats. Thanks.",
+          "truth": "technical",
+          "predicted": "account",
+          "convention": true
+        },
+        {
+          "session": 3,
+          "ticket": "I tried searching the help center first but couldn't find a clear answer. The order shipped to the wrong address, how do I redirect the delivery? Appreciate the help.",
+          "truth": "shipping",
+          "predicted": "technical",
+          "convention": false
+        },
+        {
+          "session": 3,
+          "ticket": "Hi, Tracking hasn't updated for the purchase order we placed last week. Please advise. Hoping we can sort this out quickly as it's a bit time sensitive. Not sure if this is the right channel but figured I'd ask anyway.",
+          "truth": "billing",
+          "predicted": "shipping",
+          "convention": true
+        },
+        {
+          "session": 3,
+          "ticket": "I tried searching the help center first but couldn't find a clear answer. Urgent: The purchase order delivery came damaged, we need replacements. Please advise. I've been a customer for three years now and generally really enjoy the service.",
+          "truth": "billing",
+          "predicted": "technical",
+          "convention": true
+        },
+        {
+          "session": 3,
+          "ticket": "My colleague suggested I contact support directly about this. FYI, My account got locked after too many login attempts, please unlock it. -- a frustrated user",
+          "truth": "account",
+          "predicted": "shipping",
+          "convention": false
+        },
+        {
+          "session": 3,
+          "ticket": "Beta build 2.3 keeps logging me out mid-session. I've been a customer for three years now and generally really enjoy the service. I tried searching the help center first but couldn't find a clear answer.",
+          "truth": "feedback",
+          "predicted": "shipping",
+          "convention": true
+        },
+        {
+          "session": 4,
+          "ticket": "Sorry to bother you, I know your team is busy and doing great work. Hi, I want to delete my account and remove all my personal data. -- a frustrated user This is my second time reaching out about something this month.",
+          "truth": "account",
+          "predicted": "account",
+          "convention": false
+        },
+        {
+          "session": 4,
+          "ticket": "Hi, My invoice shows a charge I don't recognize \u2014 can you explain this billing line? Thanks. I've been a customer for three years now and generally really enjoy the service.",
+          "truth": "billing",
+          "predicted": "shipping",
+          "convention": false
+        },
+        {
+          "session": 4,
+          "ticket": "Hi, I can't log in \u2014 the page just spins and never loads the dashboard. I've been a customer for three years now and generally really enjoy the service. My colleague suggested I contact support directly about this.",
+          "truth": "technical",
+          "predicted": "feedback",
+          "convention": false
+        },
+        {
+          "session": 4,
+          "ticket": "Sorry to bother you, I know your team is busy and doing great work. Urgent: I want a refund for last month's charge, it doesn't match my plan. This is my second time reaching out about something this month.",
+          "truth": "account",
+          "predicted": "technical",
+          "convention": true
+        },
+        {
+          "session": 4,
+          "ticket": "Sorry to bother you, I know your team is busy and doing great work. This is my second time reaching out about something this month. Hi, Sync is broken between my phone and laptop, changes don't propagate. Appreciate the help.",
+          "truth": "technical",
+          "predicted": "billing",
+          "convention": false
+        },
+        {
+          "session": 4,
+          "ticket": "Hi, The hardware kit for our Project Falcon pilot hasn't arrived, tracking is stuck. Please advise. I've been a customer for three years now and generally really enjoy the service.",
+          "truth": "technical",
+          "predicted": "billing",
+          "convention": true
+        },
+        {
+          "session": 4,
+          "ticket": "Quick one \u2014 Getting a 'connection timed out' error whenever I open the reports tab. Thanks. My colleague suggested I contact support directly about this. Hoping we can sort this out quickly as it's a bit time sensitive.",
+          "truth": "technical",
+          "predicted": "feedback",
+          "convention": false
+        },
+        {
+          "session": 4,
+          "ticket": "For context, I'm on the annual plan and use the product daily for work. Hoping we can sort this out quickly as it's a bit time sensitive. Quick one \u2014 Our Acme account isn't syncing orders since yesterday's update. Thanks.",
+          "truth": "shipping",
+          "predicted": "technical",
+          "convention": true
+        },
+        {
+          "session": 4,
+          "ticket": "Please process a refund for the duplicate payment on my invoice. Please advise. I tried searching the help center first but couldn't find a clear answer.",
+          "truth": "account",
+          "predicted": "shipping",
+          "convention": true
+        },
+        {
+          "session": 4,
+          "ticket": "Our Acme account isn't syncing orders since yesterday's update. -- a frustrated user Hoping we can sort this out quickly as it's a bit time sensitive. My colleague suggested I contact support directly about this.",
+          "truth": "shipping",
+          "predicted": "account",
+          "convention": true
+        },
+        {
+          "session": 4,
+          "ticket": "Urgent: The purchase order delivery came damaged, we need replacements. Thanks. I tried searching the help center first but couldn't find a clear answer. For context, I'm on the annual plan and use the product daily for work.",
+          "truth": "billing",
+          "predicted": "billing",
+          "convention": true
+        },
+        {
+          "session": 4,
+          "ticket": "Urgent: In the beta, the search bar returns no results half the time. -- a frustrated user For context, I'm on the annual plan and use the product daily for work. I tried searching the help center first but couldn't find a clear answer.",
+          "truth": "feedback",
+          "predicted": "technical",
+          "convention": true
+        },
+        {
+          "session": 4,
+          "ticket": "FYI, I love the product but wish the mobile app had offline support. Thanks. I've been a customer for three years now and generally really enjoy the service. This is my second time reaching out about something this month.",
+          "truth": "feedback",
+          "predicted": "technical",
+          "convention": false
+        },
+        {
+          "session": 4,
+          "ticket": "This is my second time reaching out about something this month. Urgent: A suggestion: it would be great to have keyboard shortcuts for navigation. Thanks.",
+          "truth": "feedback",
+          "predicted": "feedback",
+          "convention": false
+        },
+        {
+          "session": 4,
+          "ticket": "For context, I'm on the annual plan and use the product daily for work. Hi, I need to reset my password but the reset email never arrives. Please advise.",
+          "truth": "account",
+          "predicted": "shipping",
+          "convention": false
+        },
+        {
+          "session": 5,
+          "ticket": "I've been a customer for three years now and generally really enjoy the service. Hi, Need a pricing breakdown for the Project Falcon add-on seats. Appreciate the help.",
+          "truth": "technical",
+          "predicted": "account",
+          "convention": true
+        },
+        {
+          "session": 5,
+          "ticket": "My colleague suggested I contact support directly about this. Urgent: Where is my order? The courier tracking says pending for five days.",
+          "truth": "shipping",
+          "predicted": "account",
+          "convention": false
+        },
+        {
+          "session": 5,
+          "ticket": "Not sure if this is the right channel but figured I'd ask anyway. I've been a customer for three years now and generally really enjoy the service. Quick one \u2014 Acme: data sync stalls halfway and never completes. Thanks.",
+          "truth": "shipping",
+          "predicted": "shipping",
+          "convention": true
+        },
+        {
+          "session": 5,
+          "ticket": "My colleague suggested I contact support directly about this. Hello team, Why did my monthly payment go up? I want a breakdown of the new pricing. Appreciate the help. For context, I'm on the annual plan and use the product daily for work.",
+          "truth": "billing",
+          "predicted": "feedback",
+          "convention": false
+        },
+        {
+          "session": 5,
+          "ticket": "Not sure if this is the right channel but figured I'd ask anyway. Quick one \u2014 The new beta dashboard breaks on mobile, thought you should know. Please advise. This is my second time reaching out about something this month.",
+          "truth": "feedback",
+          "predicted": "account",
+          "convention": true
+        },
+        {
+          "session": 5,
+          "ticket": "Can I get a refund on the annual renewal that just went through? My colleague suggested I contact support directly about this. This is my second time reaching out about something this month.",
+          "truth": "account",
+          "predicted": "billing",
+          "convention": true
+        },
+        {
+          "session": 5,
+          "ticket": "This is my second time reaching out about something this month. Not sure if this is the right channel but figured I'd ask anyway. The export button does nothing when I click it, seems like a bug. Please advise.",
+          "truth": "technical",
+          "predicted": "billing",
+          "convention": false
+        },
+        {
+          "session": 5,
+          "ticket": "Not sure if this is the right channel but figured I'd ask anyway. Our purchase order shipment shows the wrong delivery address. -- a frustrated user",
+          "truth": "billing",
+          "predicted": "shipping",
+          "convention": true
+        },
+        {
+          "session": 5,
+          "ticket": "I've been a customer for three years now and generally really enjoy the service. The new beta dashboard breaks on mobile, thought you should know. Please advise.",
+          "truth": "feedback",
+          "predicted": "technical",
+          "convention": true
+        },
+        {
+          "session": 5,
+          "ticket": "Hoping we can sort this out quickly as it's a bit time sensitive. I've been a customer for three years now and generally really enjoy the service. I can't log in \u2014 the page just spins and never loads the dashboard. Appreciate the help.",
+          "truth": "technical",
+          "predicted": "billing",
+          "convention": false
+        },
+        {
+          "session": 5,
+          "ticket": "My colleague suggested I contact support directly about this. Hoping we can sort this out quickly as it's a bit time sensitive. Hi, Getting a 'connection timed out' error whenever I open the reports tab. Appreciate the help.",
+          "truth": "technical",
+          "predicted": "feedback",
+          "convention": false
+        },
+        {
+          "session": 5,
+          "ticket": "Sorry to bother you, I know your team is busy and doing great work. Hi, The purchase order delivery came damaged, we need replacements. Thanks.",
+          "truth": "billing",
+          "predicted": "shipping",
+          "convention": true
+        },
+        {
+          "session": 5,
+          "ticket": "Hi, Just wanted to say the new dark mode looks fantastic, great work team! Appreciate the help. Not sure if this is the right channel but figured I'd ask anyway. Sorry to bother you, I know your team is busy and doing great work.",
+          "truth": "feedback",
+          "predicted": "feedback",
+          "convention": false
+        },
+        {
+          "session": 5,
+          "ticket": "Just wanted to say the new dark mode looks fantastic, great work team! -- a frustrated user This is my second time reaching out about something this month.",
+          "truth": "feedback",
+          "predicted": "billing",
+          "convention": false
+        },
+        {
+          "session": 5,
+          "ticket": "For context, I'm on the annual plan and use the product daily for work. Urgent: Can I upgrade to express shipping for the order I just placed? Thanks. I tried searching the help center first but couldn't find a clear answer.",
+          "truth": "shipping",
+          "predicted": "feedback",
+          "convention": false
+        }
+      ],
+      "convention_first": 0.2857,
+      "convention_last": 0.1429,
+      "convention_mean": 0.2286,
+      "plain_mean": 0.225
+    },
+    "qwen+mnemo": {
+      "per_session": [
+        {
+          "session": 1,
+          "convention_acc": 0.1429,
+          "plain_acc": 0.375
+        },
+        {
+          "session": 2,
+          "convention_acc": 0.2857,
+          "plain_acc": 0.25
+        },
+        {
+          "session": 3,
+          "convention_acc": 0.7143,
+          "plain_acc": 0.25
+        },
+        {
+          "session": 4,
+          "convention_acc": 0.4286,
+          "plain_acc": 0.5
+        },
+        {
+          "session": 5,
+          "convention_acc": 0.8571,
+          "plain_acc": 0.25
+        }
+      ],
+      "predictions": [
+        {
+          "session": 1,
+          "ticket": "I've been a customer for three years now and generally really enjoy the service. Hoping we can sort this out quickly as it's a bit time sensitive. Hello team, Requesting a refund \u2014 I was billed again after cancelling. Thanks.",
+          "truth": "account",
+          "predicted": "billing",
+          "convention": true
+        },
+        {
+          "session": 1,
+          "ticket": "I've been a customer for three years now and generally really enjoy the service. Sorry to bother you, I know your team is busy and doing great work. Hello team, The app crashes every time I try to upload a file, error code 500. -- a frustrated user",
+          "truth": "technical",
+          "predicted": "account",
+          "convention": false
+        },
+        {
+          "session": 1,
+          "ticket": "I've been a customer for three years now and generally really enjoy the service. Quick one \u2014 The Acme integration sync throws timeout errors all morning. -- a frustrated user",
+          "truth": "shipping",
+          "predicted": "technical",
+          "convention": true
+        },
+        {
+          "session": 1,
+          "ticket": "I've been a customer for three years now and generally really enjoy the service. Quick one \u2014 Why did my monthly payment go up? I want a breakdown of the new pricing.",
+          "truth": "billing",
+          "predicted": "shipping",
+          "convention": false
+        },
+        {
+          "session": 1,
+          "ticket": "I tried searching the help center first but couldn't find a clear answer. Please process a refund for the duplicate payment on my invoice. Please advise. I've been a customer for three years now and generally really enjoy the service.",
+          "truth": "account",
+          "predicted": "billing",
+          "convention": true
+        },
+        {
+          "session": 1,
+          "ticket": "FYI, A suggestion: it would be great to have keyboard shortcuts for navigation. Thanks. I've been a customer for three years now and generally really enjoy the service. My colleague suggested I contact support directly about this.",
+          "truth": "feedback",
+          "predicted": "shipping",
+          "convention": false
+        },
+        {
+          "session": 1,
+          "ticket": "Quick one \u2014 Tracking hasn't updated for the purchase order we placed last week. -- a frustrated user This is my second time reaching out about something this month.",
+          "truth": "billing",
+          "predicted": "feedback",
+          "convention": true
+        },
+        {
+          "session": 1,
+          "ticket": "My colleague suggested I contact support directly about this. Quick one \u2014 The app crashes every time I try to upload a file, error code 500. Please advise. I've been a customer for three years now and generally really enjoy the service.",
+          "truth": "technical",
+          "predicted": "technical",
+          "convention": false
+        },
+        {
+          "session": 1,
+          "ticket": "For context, I'm on the annual plan and use the product daily for work. The hardware kit for our Project Falcon pilot hasn't arrived, tracking is stuck. This is my second time reaching out about something this month.",
+          "truth": "technical",
+          "predicted": "billing",
+          "convention": true
+        },
+        {
+          "session": 1,
+          "ticket": "Feature request \u2014 please add CSV import to the dashboard. This is my second time reaching out about something this month.",
+          "truth": "feedback",
+          "predicted": "billing",
+          "convention": false
+        },
+        {
+          "session": 1,
+          "ticket": "Urgent: The hardware kit for our Project Falcon pilot hasn't arrived, tracking is stuck. Please advise. This is my second time reaching out about something this month. Sorry to bother you, I know your team is busy and doing great work.",
+          "truth": "technical",
+          "predicted": "technical",
+          "convention": true
+        },
+        {
+          "session": 1,
+          "ticket": "I've been a customer for three years now and generally really enjoy the service. My colleague suggested I contact support directly about this. Urgent: I need to reset my password but the reset email never arrives. Appreciate the help.",
+          "truth": "account",
+          "predicted": "feedback",
+          "convention": false
+        },
+        {
+          "session": 1,
+          "ticket": "Hoping we can sort this out quickly as it's a bit time sensitive. Sorry to bother you, I know your team is busy and doing great work. The app crashes every time I try to upload a file, error code 500.",
+          "truth": "technical",
+          "predicted": "technical",
+          "convention": false
+        },
+        {
+          "session": 1,
+          "ticket": "This is my second time reaching out about something this month. I've been a customer for three years now and generally really enjoy the service. I want to delete my account and remove all my personal data. Appreciate the help.",
+          "truth": "account",
+          "predicted": "account",
+          "convention": false
+        },
+        {
+          "session": 1,
+          "ticket": "Found a crash in the beta build when exporting reports. Thanks. I've been a customer for three years now and generally really enjoy the service.",
+          "truth": "feedback",
+          "predicted": "shipping",
+          "convention": true
+        },
+        {
+          "session": 2,
+          "ticket": "FYI, I love the product but wish the mobile app had offline support. Not sure if this is the right channel but figured I'd ask anyway.",
+          "truth": "feedback",
+          "predicted": "technical",
+          "convention": false
+        },
+        {
+          "session": 2,
+          "ticket": "Sorry to bother you, I know your team is busy and doing great work. Quick one \u2014 When will the items on our purchase order arrive at the depot?",
+          "truth": "billing",
+          "predicted": "technical",
+          "convention": true
+        },
+        {
+          "session": 2,
+          "ticket": "I've been a customer for three years now and generally really enjoy the service. Quick one \u2014 Beta build 2.3 keeps logging me out mid-session. Please advise.",
+          "truth": "feedback",
+          "predicted": "feedback",
+          "convention": true
+        },
+        {
+          "session": 2,
+          "ticket": "I've been a customer for three years now and generally really enjoy the service. Hello team, Acme here \u2014 sync between the app and our warehouse feed is broken again. Thanks.",
+          "truth": "shipping",
+          "predicted": "technical",
+          "convention": true
+        },
+        {
+          "session": 2,
+          "ticket": "Hi, Please add two admin users to our Project Falcon workspace. Please advise. Hoping we can sort this out quickly as it's a bit time sensitive. My colleague suggested I contact support directly about this.",
+          "truth": "technical",
+          "predicted": "technical",
+          "convention": true
+        },
+        {
+          "session": 2,
+          "ticket": "I've been a customer for three years now and generally really enjoy the service. FYI, I received a damaged item in my shipment, need a replacement sent. Appreciate the help.",
+          "truth": "shipping",
+          "predicted": "account",
+          "convention": false
+        },
+        {
+          "session": 2,
+          "ticket": "I cancelled last week but was still charged for a renewal today. Appreciate the help. This is my second time reaching out about something this month. Not sure if this is the right channel but figured I'd ask anyway.",
+          "truth": "billing",
+          "predicted": "account",
+          "convention": false
+        },
+        {
+          "session": 2,
+          "ticket": "FYI, Please process a refund for the duplicate payment on my invoice. This is my second time reaching out about something this month.",
+          "truth": "account",
+          "predicted": "feedback",
+          "convention": true
+        },
+        {
+          "session": 2,
+          "ticket": "This is my second time reaching out about something this month. Hi, The Acme integration sync throws timeout errors all morning. Thanks. My colleague suggested I contact support directly about this.",
+          "truth": "shipping",
+          "predicted": "technical",
+          "convention": true
+        },
+        {
+          "session": 2,
+          "ticket": "I tried searching the help center first but couldn't find a clear answer. I've been a customer for three years now and generally really enjoy the service. FYI, My package was supposed to arrive yesterday but the tracking hasn't updated. Appreciate the help.",
+          "truth": "shipping",
+          "predicted": "account",
+          "convention": false
+        },
+        {
+          "session": 2,
+          "ticket": "Quick one \u2014 I cancelled last week but was still charged for a renewal today. I've been a customer for three years now and generally really enjoy the service. My colleague suggested I contact support directly about this.",
+          "truth": "billing",
+          "predicted": "technical",
+          "convention": false
+        },
+        {
+          "session": 2,
+          "ticket": "Hi, The new beta dashboard breaks on mobile, thought you should know. -- a frustrated user My colleague suggested I contact support directly about this.",
+          "truth": "feedback",
+          "predicted": "shipping",
+          "convention": true
+        },
+        {
+          "session": 2,
+          "ticket": "I've been a customer for three years now and generally really enjoy the service. Hello team, Getting a 'connection timed out' error whenever I open the reports tab. -- a frustrated user",
+          "truth": "technical",
+          "predicted": "technical",
+          "convention": false
+        },
+        {
+          "session": 2,
+          "ticket": "For context, I'm on the annual plan and use the product daily for work. I've been a customer for three years now and generally really enjoy the service. FYI, I cancelled last week but was still charged for a renewal today. Please advise.",
+          "truth": "billing",
+          "predicted": "technical",
+          "convention": false
+        },
+        {
+          "session": 2,
+          "ticket": "Hello team, Sync is broken between my phone and laptop, changes don't propagate. -- a frustrated user Sorry to bother you, I know your team is busy and doing great work.",
+          "truth": "technical",
+          "predicted": "technical",
+          "convention": false
+        },
+        {
+          "session": 3,
+          "ticket": "I tried searching the help center first but couldn't find a clear answer. Hoping we can sort this out quickly as it's a bit time sensitive. Quick one \u2014 The app crashes every time I try to upload a file, error code 500. -- a frustrated user",
+          "truth": "technical",
+          "predicted": "technical",
+          "convention": false
+        },
+        {
+          "session": 3,
+          "ticket": "I've been a customer for three years now and generally really enjoy the service. Sorry to bother you, I know your team is busy and doing great work. Hi, I received a damaged item in my shipment, need a replacement sent.",
+          "truth": "shipping",
+          "predicted": "technical",
+          "convention": false
+        },
+        {
+          "session": 3,
+          "ticket": "Not sure if this is the right channel but figured I'd ask anyway. Sorry to bother you, I know your team is busy and doing great work. Why did my monthly payment go up? I want a breakdown of the new pricing. -- a frustrated user",
+          "truth": "billing",
+          "predicted": "technical",
+          "convention": false
+        },
+        {
+          "session": 3,
+          "ticket": "For context, I'm on the annual plan and use the product daily for work. Hello team, The hardware kit for our Project Falcon pilot hasn't arrived, tracking is stuck.",
+          "truth": "technical",
+          "predicted": "technical",
+          "convention": true
+        },
+        {
+          "session": 3,
+          "ticket": "This is my second time reaching out about something this month. Sorry to bother you, I know your team is busy and doing great work. Quick one \u2014 Our Acme account isn't syncing orders since yesterday's update. Thanks.",
+          "truth": "shipping",
+          "predicted": "technical",
+          "convention": true
+        },
+        {
+          "session": 3,
+          "ticket": "Hi, My invoice shows a charge I don't recognize \u2014 can you explain this billing line? Please advise. For context, I'm on the annual plan and use the product daily for work.",
+          "truth": "billing",
+          "predicted": "technical",
+          "convention": false
+        },
+        {
+          "session": 3,
+          "ticket": "My colleague suggested I contact support directly about this. FYI, Can I get a refund on the annual renewal that just went through? Appreciate the help.",
+          "truth": "account",
+          "predicted": "account",
+          "convention": true
+        },
+        {
+          "session": 3,
+          "ticket": "Hello team, My account got locked after too many login attempts, please unlock it. Appreciate the help. I tried searching the help center first but couldn't find a clear answer.",
+          "truth": "account",
+          "predicted": "account",
+          "convention": false
+        },
+        {
+          "session": 3,
+          "ticket": "FYI, Why did my monthly payment go up? I want a breakdown of the new pricing. Please advise. Hoping we can sort this out quickly as it's a bit time sensitive.",
+          "truth": "billing",
+          "predicted": "technical",
+          "convention": false
+        },
+        {
+          "session": 3,
+          "ticket": "Hoping we can sort this out quickly as it's a bit time sensitive. This is my second time reaching out about something this month. Urgent: Need a pricing breakdown for the Project Falcon add-on seats. Thanks.",
+          "truth": "technical",
+          "predicted": "technical",
+          "convention": true
+        },
+        {
+          "session": 3,
+          "ticket": "I tried searching the help center first but couldn't find a clear answer. The order shipped to the wrong address, how do I redirect the delivery? Appreciate the help.",
+          "truth": "shipping",
+          "predicted": "account",
+          "convention": false
+        },
+        {
+          "session": 3,
+          "ticket": "Hi, Tracking hasn't updated for the purchase order we placed last week. Please advise. Hoping we can sort this out quickly as it's a bit time sensitive. Not sure if this is the right channel but figured I'd ask anyway.",
+          "truth": "billing",
+          "predicted": "billing",
+          "convention": true
+        },
+        {
+          "session": 3,
+          "ticket": "I tried searching the help center first but couldn't find a clear answer. Urgent: The purchase order delivery came damaged, we need replacements. Please advise. I've been a customer for three years now and generally really enjoy the service.",
+          "truth": "billing",
+          "predicted": "account",
+          "convention": true
+        },
+        {
+          "session": 3,
+          "ticket": "My colleague suggested I contact support directly about this. FYI, My account got locked after too many login attempts, please unlock it. -- a frustrated user",
+          "truth": "account",
+          "predicted": "feedback",
+          "convention": false
+        },
+        {
+          "session": 3,
+          "ticket": "Beta build 2.3 keeps logging me out mid-session. I've been a customer for three years now and generally really enjoy the service. I tried searching the help center first but couldn't find a clear answer.",
+          "truth": "feedback",
+          "predicted": "feedback",
+          "convention": true
+        },
+        {
+          "session": 4,
+          "ticket": "Sorry to bother you, I know your team is busy and doing great work. Hi, I want to delete my account and remove all my personal data. -- a frustrated user This is my second time reaching out about something this month.",
+          "truth": "account",
+          "predicted": "technical",
+          "convention": false
+        },
+        {
+          "session": 4,
+          "ticket": "Hi, My invoice shows a charge I don't recognize \u2014 can you explain this billing line? Thanks. I've been a customer for three years now and generally really enjoy the service.",
+          "truth": "billing",
+          "predicted": "billing",
+          "convention": false
+        },
+        {
+          "session": 4,
+          "ticket": "Hi, I can't log in \u2014 the page just spins and never loads the dashboard. I've been a customer for three years now and generally really enjoy the service. My colleague suggested I contact support directly about this.",
+          "truth": "technical",
+          "predicted": "technical",
+          "convention": false
+        },
+        {
+          "session": 4,
+          "ticket": "Sorry to bother you, I know your team is busy and doing great work. Urgent: I want a refund for last month's charge, it doesn't match my plan. This is my second time reaching out about something this month.",
+          "truth": "account",
+          "predicted": "technical",
+          "convention": true
+        },
+        {
+          "session": 4,
+          "ticket": "Sorry to bother you, I know your team is busy and doing great work. This is my second time reaching out about something this month. Hi, Sync is broken between my phone and laptop, changes don't propagate. Appreciate the help.",
+          "truth": "technical",
+          "predicted": "technical",
+          "convention": false
+        },
+        {
+          "session": 4,
+          "ticket": "Hi, The hardware kit for our Project Falcon pilot hasn't arrived, tracking is stuck. Please advise. I've been a customer for three years now and generally really enjoy the service.",
+          "truth": "technical",
+          "predicted": "technical",
+          "convention": true
+        },
+        {
+          "session": 4,
+          "ticket": "Quick one \u2014 Getting a 'connection timed out' error whenever I open the reports tab. Thanks. My colleague suggested I contact support directly about this. Hoping we can sort this out quickly as it's a bit time sensitive.",
+          "truth": "technical",
+          "predicted": "technical",
+          "convention": false
+        },
+        {
+          "session": 4,
+          "ticket": "For context, I'm on the annual plan and use the product daily for work. Hoping we can sort this out quickly as it's a bit time sensitive. Quick one \u2014 Our Acme account isn't syncing orders since yesterday's update. Thanks.",
+          "truth": "shipping",
+          "predicted": "technical",
+          "convention": true
+        },
+        {
+          "session": 4,
+          "ticket": "Please process a refund for the duplicate payment on my invoice. Please advise. I tried searching the help center first but couldn't find a clear answer.",
+          "truth": "account",
+          "predicted": "account",
+          "convention": true
+        },
+        {
+          "session": 4,
+          "ticket": "Our Acme account isn't syncing orders since yesterday's update. -- a frustrated user Hoping we can sort this out quickly as it's a bit time sensitive. My colleague suggested I contact support directly about this.",
+          "truth": "shipping",
+          "predicted": "technical",
+          "convention": true
+        },
+        {
+          "session": 4,
+          "ticket": "Urgent: The purchase order delivery came damaged, we need replacements. Thanks. I tried searching the help center first but couldn't find a clear answer. For context, I'm on the annual plan and use the product daily for work.",
+          "truth": "billing",
+          "predicted": "billing",
+          "convention": true
+        },
+        {
+          "session": 4,
+          "ticket": "Urgent: In the beta, the search bar returns no results half the time. -- a frustrated user For context, I'm on the annual plan and use the product daily for work. I tried searching the help center first but couldn't find a clear answer.",
+          "truth": "feedback",
+          "predicted": "billing",
+          "convention": true
+        },
+        {
+          "session": 4,
+          "ticket": "FYI, I love the product but wish the mobile app had offline support. Thanks. I've been a customer for three years now and generally really enjoy the service. This is my second time reaching out about something this month.",
+          "truth": "feedback",
+          "predicted": "technical",
+          "convention": false
+        },
+        {
+          "session": 4,
+          "ticket": "This is my second time reaching out about something this month. Urgent: A suggestion: it would be great to have keyboard shortcuts for navigation. Thanks.",
+          "truth": "feedback",
+          "predicted": "technical",
+          "convention": false
+        },
+        {
+          "session": 4,
+          "ticket": "For context, I'm on the annual plan and use the product daily for work. Hi, I need to reset my password but the reset email never arrives. Please advise.",
+          "truth": "account",
+          "predicted": "technical",
+          "convention": false
+        },
+        {
+          "session": 5,
+          "ticket": "I've been a customer for three years now and generally really enjoy the service. Hi, Need a pricing breakdown for the Project Falcon add-on seats. Appreciate the help.",
+          "truth": "technical",
+          "predicted": "technical",
+          "convention": true
+        },
+        {
+          "session": 5,
+          "ticket": "My colleague suggested I contact support directly about this. Urgent: Where is my order? The courier tracking says pending for five days.",
+          "truth": "shipping",
+          "predicted": "billing",
+          "convention": false
+        },
+        {
+          "session": 5,
+          "ticket": "Not sure if this is the right channel but figured I'd ask anyway. I've been a customer for three years now and generally really enjoy the service. Quick one \u2014 Acme: data sync stalls halfway and never completes. Thanks.",
+          "truth": "shipping",
+          "predicted": "shipping",
+          "convention": true
+        },
+        {
+          "session": 5,
+          "ticket": "My colleague suggested I contact support directly about this. Hello team, Why did my monthly payment go up? I want a breakdown of the new pricing. Appreciate the help. For context, I'm on the annual plan and use the product daily for work.",
+          "truth": "billing",
+          "predicted": "account",
+          "convention": false
+        },
+        {
+          "session": 5,
+          "ticket": "Not sure if this is the right channel but figured I'd ask anyway. Quick one \u2014 The new beta dashboard breaks on mobile, thought you should know. Please advise. This is my second time reaching out about something this month.",
+          "truth": "feedback",
+          "predicted": "feedback",
+          "convention": true
+        },
+        {
+          "session": 5,
+          "ticket": "Can I get a refund on the annual renewal that just went through? My colleague suggested I contact support directly about this. This is my second time reaching out about something this month.",
+          "truth": "account",
+          "predicted": "account",
+          "convention": true
+        },
+        {
+          "session": 5,
+          "ticket": "This is my second time reaching out about something this month. Not sure if this is the right channel but figured I'd ask anyway. The export button does nothing when I click it, seems like a bug. Please advise.",
+          "truth": "technical",
+          "predicted": "billing",
+          "convention": false
+        },
+        {
+          "session": 5,
+          "ticket": "Not sure if this is the right channel but figured I'd ask anyway. Our purchase order shipment shows the wrong delivery address. -- a frustrated user",
+          "truth": "billing",
+          "predicted": "billing",
+          "convention": true
+        },
+        {
+          "session": 5,
+          "ticket": "I've been a customer for three years now and generally really enjoy the service. The new beta dashboard breaks on mobile, thought you should know. Please advise.",
+          "truth": "feedback",
+          "predicted": "feedback",
+          "convention": true
+        },
+        {
+          "session": 5,
+          "ticket": "Hoping we can sort this out quickly as it's a bit time sensitive. I've been a customer for three years now and generally really enjoy the service. I can't log in \u2014 the page just spins and never loads the dashboard. Appreciate the help.",
+          "truth": "technical",
+          "predicted": "technical",
+          "convention": false
+        },
+        {
+          "session": 5,
+          "ticket": "My colleague suggested I contact support directly about this. Hoping we can sort this out quickly as it's a bit time sensitive. Hi, Getting a 'connection timed out' error whenever I open the reports tab. Appreciate the help.",
+          "truth": "technical",
+          "predicted": "technical",
+          "convention": false
+        },
+        {
+          "session": 5,
+          "ticket": "Sorry to bother you, I know your team is busy and doing great work. Hi, The purchase order delivery came damaged, we need replacements. Thanks.",
+          "truth": "billing",
+          "predicted": "technical",
+          "convention": true
+        },
+        {
+          "session": 5,
+          "ticket": "Hi, Just wanted to say the new dark mode looks fantastic, great work team! Appreciate the help. Not sure if this is the right channel but figured I'd ask anyway. Sorry to bother you, I know your team is busy and doing great work.",
+          "truth": "feedback",
+          "predicted": "billing",
+          "convention": false
+        },
+        {
+          "session": 5,
+          "ticket": "Just wanted to say the new dark mode looks fantastic, great work team! -- a frustrated user This is my second time reaching out about something this month.",
+          "truth": "feedback",
+          "predicted": "technical",
+          "convention": false
+        },
+        {
+          "session": 5,
+          "ticket": "For context, I'm on the annual plan and use the product daily for work. Urgent: Can I upgrade to express shipping for the order I just placed? Thanks. I tried searching the help center first but couldn't find a clear answer.",
+          "truth": "shipping",
+          "predicted": "billing",
+          "convention": false
+        }
+      ],
+      "convention_first": 0.1429,
+      "convention_last": 0.8571,
+      "convention_mean": 0.4857,
+      "plain_mean": 0.325,
+      "distilled_rules": [
+        "IF ticket mentions 'app' THEN category=technical",
+        "IF ticket mentions 'bother' THEN category=technical",
+        "IF ticket mentions 'busy' THEN category=technical",
+        "IF ticket mentions 'code' THEN category=technical",
+        "IF ticket mentions 'crashes' THEN category=technical",
+        "IF ticket mentions 'doing' THEN category=technical",
+        "IF ticket mentions 'error' THEN category=technical",
+        "IF ticket mentions 'every' THEN category=technical",
+        "IF ticket mentions 'file' THEN category=technical",
+        "IF ticket mentions 'great' THEN category=technical",
+        "IF ticket mentions 'help' THEN category=account",
+        "IF ticket mentions 'last' THEN category=billing",
+        "IF ticket mentions 'sorry' THEN category=technical",
+        "IF ticket mentions 'week' THEN category=billing",
+        "IF ticket mentions 'your' THEN category=technical",
+        "IF ticket mentions 'acme' THEN category=shipping",
+        "IF ticket mentions 'beta' THEN category=feedback",
+        "IF ticket mentions 'cancelled' THEN category=billing",
+        "IF ticket mentions 'charged' THEN category=billing",
+        "IF ticket mentions 'falcon' THEN category=technical",
+        "IF ticket mentions 'project' THEN category=technical",
+        "IF ticket mentions 'order' THEN category=billing",
+        "IF ticket mentions 'purchase' THEN category=billing",
+        "IF ticket mentions 'refund' THEN category=account",
+        "IF ticket mentions 'arrived' THEN category=technical",
+        "IF ticket mentions 'mobile' THEN category=feedback"
+      ]
+    }
+  },
+  "headline": {
+    "convention_gap_last_session": 0.7142,
+    "alone_convention_mean": 0.2286,
+    "mnemo_convention_mean": 0.4857
+  }
+}

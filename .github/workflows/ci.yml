@@ -1,0 +1,25 @@
+name: ci
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      MNEMO_OFFLINE: "1"
+      MNEMO_STORE: memory
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -r requirements.txt
+      # Experiment 1 invariant: no-memory < episodic-RAG < Mnemo, curve climbs
+      - run: python -m tests.test_learning
+      # Experiment 2 invariant: all 5 org conventions distilled, memory beats zero-shot
+      - run: python -m tests.test_org_learning
+      # API loop: seed -> triage (fired provenance) -> feedback reinforcement -> eval cache
+      - run: python -m tests.test_api

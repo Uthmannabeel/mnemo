@@ -1,0 +1,124 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="820" viewBox="0 0 1200 820" font-family="Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#151a29"/>
+      <stop offset="0.55" stop-color="#0b0d12"/>
+    </linearGradient>
+    <linearGradient id="panel" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#131722"/>
+      <stop offset="1" stop-color="#10141d"/>
+    </linearGradient>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#8a94a7"/>
+    </marker>
+    <marker id="arrowP" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#7c5cff"/>
+    </marker>
+    <marker id="arrowG" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#37d39b"/>
+    </marker>
+  </defs>
+
+  <rect width="1200" height="820" fill="url(#bg)"/>
+
+  <!-- title -->
+  <text x="48" y="52" fill="#e7ecf3" font-size="26" font-weight="700" letter-spacing="-0.5">Mnemo</text>
+  <text x="140" y="52" fill="#7c5cff" font-size="14" font-weight="600">— a self-improving memory agent</text>
+  <rect x="48" y="66" width="330" height="1.5" fill="#232a3b"/>
+  <text x="48" y="88" fill="#8a94a7" font-size="13">MemoryAgent track · Qwen Cloud on Alibaba Cloud</text>
+
+  <!-- ===================== LEFT: live decision loop ===================== -->
+  <text x="70" y="128" fill="#8a94a7" font-size="12" font-weight="700" letter-spacing="1">LIVE DECISION LOOP</text>
+
+  <!-- incoming ticket -->
+  <rect x="70" y="142" width="300" height="54" rx="12" fill="url(#panel)" stroke="#232a3b"/>
+  <text x="220" y="174" fill="#e7ecf3" font-size="15" font-weight="600" text-anchor="middle">Incoming support ticket</text>
+
+  <!-- triage agent -->
+  <rect x="70" y="232" width="300" height="72" rx="12" fill="#1a1530" stroke="#7c5cff"/>
+  <text x="220" y="264" fill="#e7ecf3" font-size="16" font-weight="700" text-anchor="middle">TriageAgent</text>
+  <text x="220" y="286" fill="#b9a9ff" font-size="12.5" text-anchor="middle">reasons over memory · Qwen3.7-Max</text>
+
+  <!-- decision -->
+  <rect x="70" y="340" width="300" height="66" rx="12" fill="url(#panel)" stroke="#37d39b"/>
+  <text x="220" y="368" fill="#e7ecf3" font-size="15" font-weight="600" text-anchor="middle">Decision + provenance</text>
+  <text x="220" y="388" fill="#7fe3bd" font-size="12" text-anchor="middle">category + the exact memories that justified it</text>
+
+  <!-- outcome -->
+  <rect x="70" y="442" width="300" height="54" rx="12" fill="url(#panel)" stroke="#232a3b"/>
+  <text x="220" y="474" fill="#e7ecf3" font-size="14" font-weight="600" text-anchor="middle">Outcome / human feedback</text>
+
+  <!-- left vertical arrows -->
+  <line x1="220" y1="196" x2="220" y2="230" stroke="#8a94a7" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="220" y1="304" x2="220" y2="338" stroke="#8a94a7" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="220" y1="406" x2="220" y2="440" stroke="#8a94a7" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- retrieve arrow (from memory bus into agent) -->
+  <path d="M 690 268 L 470 268 L 470 268 Q 420 268 420 268 L 372 268" fill="none" stroke="#7c5cff" stroke-width="2.5" marker-end="url(#arrowP)"/>
+  <text x="540" y="258" fill="#b9a9ff" font-size="12" text-anchor="middle">retrieve · finite context budget</text>
+
+  <!-- write episode arrow (outcome -> episodic) -->
+  <path d="M 370 469 L 700 469 L 700 210 L 760 210" fill="none" stroke="#4aa8ff" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <text x="560" y="485" fill="#7bbcff" font-size="12" text-anchor="middle">write raw episode</text>
+
+  <!-- ===================== RIGHT: memory + dreaming ===================== -->
+  <text x="760" y="128" fill="#8a94a7" font-size="12" font-weight="700" letter-spacing="1">FOUR-TIER MEMORY</text>
+
+  <!-- episodic -->
+  <rect x="760" y="182" width="380" height="60" rx="12" fill="#10202f" stroke="#4aa8ff"/>
+  <text x="782" y="208" fill="#e7ecf3" font-size="15" font-weight="700">Episodic memory</text>
+  <text x="782" y="228" fill="#7bbcff" font-size="12">raw timestamped events · pgvector · source of truth</text>
+
+  <!-- dreaming loop container -->
+  <rect x="720" y="288" width="440" height="300" rx="16" fill="none" stroke="#7c5cff" stroke-width="1.6" stroke-dasharray="7 6"/>
+  <text x="740" y="314" fill="#b9a9ff" font-size="12.5" font-weight="700" letter-spacing="0.5">DREAMING LOOP · scheduled on Function Compute</text>
+
+  <!-- consolidator -->
+  <rect x="742" y="330" width="396" height="76" rx="12" fill="#1a1530" stroke="#7c5cff"/>
+  <text x="940" y="358" fill="#e7ecf3" font-size="15" font-weight="700" text-anchor="middle">Consolidator — Qwen3.7-Max</text>
+  <text x="940" y="380" fill="#b9a9ff" font-size="12" text-anchor="middle">reflect · distil · credit-assign · decay · resolve conflicts</text>
+
+  <!-- semantic -->
+  <rect x="742" y="500" width="190" height="66" rx="12" fill="#2a2210" stroke="#ffb454"/>
+  <text x="837" y="528" fill="#e7ecf3" font-size="14" font-weight="700" text-anchor="middle">Semantic</text>
+  <text x="837" y="548" fill="#ffcf8a" font-size="11.5" text-anchor="middle">distilled facts</text>
+
+  <!-- procedural -->
+  <rect x="948" y="500" width="190" height="66" rx="12" fill="#1a1530" stroke="#7c5cff"/>
+  <text x="1043" y="528" fill="#e7ecf3" font-size="14" font-weight="700" text-anchor="middle">Procedural</text>
+  <text x="1043" y="548" fill="#b9a9ff" font-size="11.5" text-anchor="middle">learned IF→THEN rules</text>
+
+  <!-- arrows: episodic -> consolidator -->
+  <line x1="950" y1="242" x2="950" y2="328" stroke="#8a94a7" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <text x="1010" y="292" fill="#8a94a7" font-size="12" text-anchor="middle">reflect over</text>
+
+  <!-- consolidator -> semantic / procedural -->
+  <line x1="880" y1="406" x2="850" y2="498" stroke="#8a94a7" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <line x1="1000" y1="406" x2="1035" y2="498" stroke="#8a94a7" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <text x="940" y="452" fill="#8a94a7" font-size="12" text-anchor="middle">promote ↑ tiers</text>
+
+  <!-- semantic + procedural feed retrieval (green, back to the working set/agent) -->
+  <path d="M 837 566 L 837 640 L 430 640 L 430 300 L 690 275" fill="none" stroke="#37d39b" stroke-width="2.2" marker-end="url(#arrowG)"/>
+  <path d="M 1043 566 L 1043 660 L 410 660 L 410 290 L 690 271" fill="none" stroke="#37d39b" stroke-width="2.2"/>
+  <text x="470" y="632" fill="#7fe3bd" font-size="12">distilled rules steer future decisions</text>
+
+  <!-- episodic also feeds retrieval -->
+  <path d="M 760 212 L 690 212 L 690 262" fill="none" stroke="#4aa8ff" stroke-width="2" marker-end="url(#arrowP)"/>
+
+  <!-- ===================== Alibaba Cloud ribbon ===================== -->
+  <rect x="48" y="704" width="1104" height="86" rx="14" fill="#0e1320" stroke="#232a3b"/>
+  <text x="70" y="732" fill="#ff7a45" font-size="13" font-weight="700" letter-spacing="0.5">ALIBABA CLOUD</text>
+
+  <rect x="70" y="742" width="330" height="36" rx="10" fill="#131722" stroke="#232a3b"/>
+  <text x="86" y="765" fill="#cdd6e4" font-size="12.5">Model Studio / DashScope · Qwen3.7-Max + embeddings</text>
+
+  <rect x="420" y="742" width="270" height="36" rx="10" fill="#131722" stroke="#232a3b"/>
+  <text x="436" y="765" fill="#cdd6e4" font-size="12.5">RDS for PostgreSQL · pgvector</text>
+
+  <rect x="710" y="742" width="420" height="36" rx="10" fill="#131722" stroke="#232a3b"/>
+  <text x="726" y="765" fill="#cdd6e4" font-size="12.5">ECS / Function Compute · FastAPI + scheduled Dreaming cron</text>
+
+  <!-- result stamp -->
+  <text x="1152" y="52" text-anchor="end" fill="#37d39b" font-size="15" font-weight="700">no-memory 21%  →  episodic-RAG 60%  →  Mnemo 71% / 100%</text>
+  <text x="1152" y="72" text-anchor="end" fill="#8a94a7" font-size="12">controlled 3-arm ablation · same context budget</text>
+</svg>

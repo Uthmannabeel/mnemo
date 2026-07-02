@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Mnemo — self-improving memory agent</title>
+<script src="/static/chart.umd.min.js"></script>
+<script>if(!window.Chart){document.write('<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"><\/script>')}</script>
+<style>
+  :root{
+    --bg:#0b0d12; --panel:#131722; --panel2:#1a2030; --line:#232a3b;
+    --ink:#e7ecf3; --dim:#8a94a7; --accent:#7c5cff; --good:#37d39b; --warn:#ffb454; --epi:#4aa8ff;
+    --font:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:radial-gradient(1200px 600px at 70% -10%,#191d2e 0,var(--bg) 55%);color:var(--ink);font-family:var(--font);}
+  header{padding:28px 32px 8px;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+  header h1{margin:0;font-size:22px;letter-spacing:-.02em}
+  .badge{font-size:12px;color:var(--accent);border:1px solid var(--accent);padding:2px 9px;border-radius:999px}
+  .sub{color:var(--dim);font-size:13px}
+  .grid{display:grid;grid-template-columns:1.4fr 1fr;gap:18px;padding:16px 32px 40px}
+  @media(max-width:980px){.grid{grid-template-columns:1fr}}
+  .card{background:linear-gradient(180deg,var(--panel),#10141d);border:1px solid var(--line);border-radius:16px;padding:18px 20px}
+  .card h2{margin:0 0 4px;font-size:14px;letter-spacing:.02em;text-transform:uppercase;color:var(--dim)}
+  .card .hint{font-size:12px;color:var(--dim);margin-bottom:12px}
+  .stat{display:flex;gap:22px;margin:10px 0 4px}
+  .stat div b{font-size:22px} .stat div span{display:block;font-size:11px;color:var(--dim)}
+  button{background:var(--accent);color:#fff;border:0;padding:9px 16px;border-radius:10px;font-weight:600;cursor:pointer;font-family:var(--font)}
+  button.ghost{background:var(--panel2);border:1px solid var(--line)}
+  button:disabled{opacity:.5;cursor:default}
+  input{width:100%;background:var(--panel2);border:1px solid var(--line);color:var(--ink);border-radius:10px;padding:11px 12px;font-family:var(--font);font-size:14px}
+  .row{display:flex;gap:10px;align-items:center;margin-top:10px}
+  .pill{font-size:12px;padding:3px 10px;border-radius:999px;background:var(--panel2);border:1px solid var(--line);color:var(--dim)}
+  .cat{font-weight:700;color:var(--good);text-transform:capitalize}
+  .tiers{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+  @media(max-width:640px){.tiers{grid-template-columns:1fr}}
+  .tier h3{margin:0 0 8px;font-size:12px;text-transform:uppercase;letter-spacing:.04em}
+  .tier.pro h3{color:var(--accent)} .tier.sem h3{color:var(--warn)} .tier.epi h3{color:var(--epi)}
+  .mem{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin-bottom:8px;font-size:12.5px;line-height:1.35}
+  .mem .meta{color:var(--dim);font-size:11px;margin-top:4px}
+  .prov{font-size:12px;color:var(--dim);margin-top:8px;max-height:120px;overflow:auto}
+  .prov .mem{margin-bottom:6px}
+  footer{color:var(--dim);font-size:12px;padding:0 32px 32px}
+  a{color:var(--accent)}
+</style>
+</head>
+<body>
+  <header>
+    <h1>Mnemo</h1>
+    <span class="badge">MemoryAgent · Qwen Cloud</span>
+    <span class="sub" id="hstatus">connecting…</span>
+  </header>
+
+  <div class="grid">
+    <!-- LEFT: the money-shot chart -->
+    <div class="card">
+      <h2>Decision accuracy across sessions</h2>
+      <div class="hint">Same tickets, same per-decision context budget. Memory is the only variable.</div>
+      <canvas id="chart" height="150"></canvas>
+      <div class="stat" id="statline"></div>
+      <div class="row">
+        <button id="runEval">▶ Run learning experiment</button>
+        <span class="pill" id="evalNote">3 arms · 8 sessions × 25 tickets</span>
+      </div>
+      <div class="hint" style="margin-top:10px">Benchmark runs on an isolated store with the deterministic
+        offline policy (reproducible, zero API cost). The live memory below is separate — seed it to explore.</div>
+    </div>
+
+    <!-- RIGHT: live triage -->
+    <div class="card">
+      <h2>Triage a ticket</h2>
+      <div class="hint">Watch the agent decide — and cite the memories that justified it.</div>
+      <input id="ticket" placeholder="e.g. I was charged twice, please refund the duplicate charge" />
+      <div class="row">
+        <button id="doTriage">Triage</button>
+        <span class="pill">predicted: <span class="cat" id="pred">—</span></span>
+      </div>
+      <div id="rationale" class="hint" style="margin-top:10px"></div>
+      <div class="prov" id="prov"></div>
+      <div id="fbRow" style="display:none;margin-top:12px">
+        <div class="hint">Was this right? Confirm to teach Mnemo — this is how it learns:</div>
+        <div class="row" id="fbBtns" style="flex-wrap:wrap"></div>
+        <div class="hint" id="fbStatus" style="margin-top:6px"></div>
+      </div>
+    </div>
+
+    <!-- BOTTOM: live memory tiers -->
+    <div class="card" style="grid-column:1/-1">
+      <h2>Memory tiers (live)</h2>
+      <div class="hint">The Dreaming loop distils raw episodes (right) into semantic facts and procedural rules (left).</div>
+      <div class="row" style="margin:2px 0 14px">
+        <button id="doSeed" class="ghost">⚡ Seed demo data</button>
+        <button id="doDream" class="ghost">💤 Dream now</button>
+        <span class="hint" id="tierStatus"></span>
+      </div>
+      <div class="tiers">
+        <div class="tier pro"><h3 id="proCount">Procedural</h3><div id="pro"></div></div>
+        <div class="tier sem"><h3 id="semCount">Semantic</h3><div id="sem"></div></div>
+        <div class="tier epi"><h3 id="epiCount">Episodic</h3><div id="epi"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <footer>Mnemo · four-tier cognitive memory · Qwen3.7-Max + Qwen embeddings on Alibaba Cloud · MIT</footer>
+
+<script>
+const API = location.origin;
+let chart;
+
+async function health(){
+  try{
+    const h = await (await fetch(API+'/health')).json();
+    document.getElementById('hstatus').textContent =
+      `${h.qwen_model} · ${h.mode} · store:${h.store}`;
+  }catch(e){ document.getElementById('hstatus').textContent = 'API offline'; }
+}
+
+function drawChart(arms){
+  const labels = arms.full.accuracy_by_session.map((_,i)=>'S'+(i+1));
+  const ds = (arm,color,label)=>({
+    label, data:arms[arm].accuracy_by_session.map(v=>+(v*100).toFixed(0)),
+    borderColor:color, backgroundColor:color+'22', tension:.35, borderWidth:3,
+    pointRadius:3, fill:false
+  });
+  const cfg = {type:'line', data:{labels, datasets:[
+    ds('none','#8a94a7','No memory'),
+    ds('episodic','#4aa8ff','Episodic RAG'),
+    ds('full','#7c5cff','Mnemo'),
+  ]}, options:{
+    plugins:{legend:{labels:{color:'#e7ecf3'}}},
+    scales:{
+      y:{min:0,max:100,ticks:{color:'#8a94a7',callback:v=>v+'%'},grid:{color:'#232a3b'}},
+      x:{ticks:{color:'#8a94a7'},grid:{color:'#1a2030'}}
+    }
+  }};
+  if(chart) chart.destroy();
+  chart = new Chart(document.getElementById('chart'), cfg);
+  const f=arms.full, e=arms.episodic, n=arms.none;
+  document.getElementById('statline').innerHTML =
+    `<div><b style="color:#7c5cff">${(f.mean*100).toFixed(0)}%</b><span>Mnemo mean</span></div>`+
+    `<div><b style="color:#4aa8ff">${(e.mean*100).toFixed(0)}%</b><span>Episodic mean</span></div>`+
+    `<div><b style="color:#8a94a7">${(n.mean*100).toFixed(0)}%</b><span>No-memory mean</span></div>`+
+    `<div><b style="color:#37d39b">+${((f.mean-e.mean)*100).toFixed(0)} pts</b><span>Mnemo vs RAG</span></div>`;
+}
+
+async function runEval(){
+  const b=document.getElementById('runEval'); b.disabled=true; b.textContent='Running…';
+  try{ const r = await (await fetch(API+'/eval',{method:'POST'})).json(); drawChart(r.arms); }
+  finally{ b.disabled=false; b.textContent='▶ Run learning experiment'; }
+}
+
+const CATEGORIES = ['billing','technical','account','shipping','feedback'];
+let lastTriage = null;
+
+function memCard(m){
+  const fired = m.fired ? ' <span style="color:var(--good);font-weight:700">● fired</span>' : '';
+  return `<div class="mem">${m.content}
+    <div class="meta">conf ${m.confidence} · used ${m.use_count}×${m.attrs&&m.attrs.category?' · '+m.attrs.category:''}${fired}</div></div>`;
+}
+const EMPTY_HINT = '<div class="hint">empty — click <b>⚡ Seed demo data</b>, or triage a ticket and confirm its category</div>';
+async function loadMemory(){
+  try{
+    const m = await (await fetch(API+'/memory')).json();
+    const set=(id,arr,countId,name)=>{
+      document.getElementById(id).innerHTML = (arr||[]).slice(0,8).map(memCard).join('') || EMPTY_HINT;
+      document.getElementById(countId).textContent = `${name} (${(arr||[]).length})`;
+    };
+    set('pro',m.procedural,'proCount','Procedural');
+    set('sem',m.semantic,'semCount','Semantic');
+    set('epi',m.episodic,'epiCount','Episodic');
+  }catch(e){}
+}
+
+async function triage(){
+  const t=document.getElementById('ticket').value.trim(); if(!t) return;
+  const r = await (await fetch(API+'/triage',{method:'POST',headers:{'content-type':'application/json'},
+    body:JSON.stringify({ticket:t})})).json();
+  document.getElementById('pred').textContent = r.category;
+  document.getElementById('rationale').textContent = r.rationale || '';
+  document.getElementById('prov').innerHTML =
+    '<b>Why (provenance):</b>' + ((r.provenance||[]).map(memCard).join('') ||
+    ' <span class="hint">no memory used yet — the agent guessed. Teach it below.</span>');
+  lastTriage = {ticket: t, category: r.category, fired_memory_ids: r.fired_memory_ids||[], used_memory_ids: r.used_memory_ids||[]};
+  renderFeedback(r.category);
+}
+
+function renderFeedback(predicted){
+  const row = document.getElementById('fbRow');
+  const btns = document.getElementById('fbBtns');
+  document.getElementById('fbStatus').textContent = '';
+  btns.innerHTML = '';
+  const ok = document.createElement('button');
+  ok.textContent = `✓ Correct (${predicted})`;
+  ok.onclick = () => sendFeedback(predicted);
+  btns.appendChild(ok);
+  for(const c of CATEGORIES){
+    if(c===predicted) continue;
+    const b = document.createElement('button');
+    b.className = 'ghost'; b.textContent = c;
+    b.onclick = () => sendFeedback(c);
+    btns.appendChild(b);
+  }
+  row.style.display = 'block';
+}
+
+async function sendFeedback(trueCat){
+  if(!lastTriage) return;
+  const r = await (await fetch(API+'/feedback',{method:'POST',headers:{'content-type':'application/json'},
+    body:JSON.stringify({ticket:lastTriage.ticket, predicted_category:lastTriage.category,
+      true_category:trueCat, fired_memory_ids:lastTriage.fired_memory_ids,
+      used_memory_ids:lastTriage.used_memory_ids})})).json();
+  const learned = trueCat===lastTriage.category ? 'Reinforced ✓' : `Corrected → ${trueCat} ✓`;
+  document.getElementById('fbStatus').textContent =
+    `${learned} — episode written to memory` + (r.dreamed ? ` · Dreaming pass distilled ${r.dreamed.procedural||0} rule(s)` : '');
+  loadMemory();
+}
+
+async function dreamNow(){
+  const s = document.getElementById('tierStatus');
+  s.textContent = 'dreaming…';
+  const r = await (await fetch(API+'/consolidate',{method:'POST'})).json();
+  s.textContent = r.episodes
+    ? `💤 reflected on ${r.episodes} episode(s) → +${r.procedural} procedural, +${r.semantic} semantic`
+    : 'nothing new to consolidate — triage & confirm some tickets first';
+  loadMemory();
+}
+
+async function seedDemo(){
+  const s = document.getElementById('tierStatus');
+  const b = document.getElementById('doSeed');
+  b.disabled = true; s.textContent = 'seeding 25 tickets through the live agent…';
+  try{
+    const r = await (await fetch(API+'/seed',{method:'POST'})).json();
+    s.textContent = `⚡ seeded ${r.seeded} tickets (${r.correct} correct pre-learning) · dreamed → +${r.dreamed.procedural||0} rules`;
+  } finally { b.disabled = false; }
+  loadMemory();
+}
+
+document.getElementById('runEval').onclick = runEval;
+document.getElementById('doTriage').onclick = triage;
+document.getElementById('doDream').onclick = dreamNow;
+document.getElementById('doSeed').onclick = seedDemo;
+document.getElementById('ticket').addEventListener('keydown',e=>{if(e.key==='Enter')triage()});
+
+health(); runEval(); loadMemory();
+setInterval(loadMemory, 4000);
+</script>
+</body>
+</html>
