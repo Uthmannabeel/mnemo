@@ -25,6 +25,15 @@ class QwenClient:
         self._embed_cache: "OrderedDict[str, list[float]]" = OrderedDict()
         self._client = None
         if not self.offline:
+            # Trust the OS certificate store when available: on Windows dev machines,
+            # AV/ISP TLS interception uses certs that are in the OS store but not in
+            # certifi's bundle, which makes every HTTPS call fail verification.
+            try:
+                import truststore
+
+                truststore.inject_into_ssl()
+            except ImportError:
+                pass  # Linux/Docker: certifi is fine
             # Imported lazily so offline/CI environments need no network stack configured.
             from openai import OpenAI
 
