@@ -55,7 +55,14 @@ app.mount("/static", StaticFiles(directory=str(_STATIC)), name="static")
 
 
 @app.get("/")
-def dashboard() -> FileResponse:
+def landing() -> FileResponse:
+    """Product landing page — the front door and the case for the product."""
+    return FileResponse(_STATIC / "landing.html")
+
+
+@app.get("/console")
+def console() -> FileResponse:
+    """The working console: triage, memory browser, evidence charts."""
     return FileResponse(_STATIC / "index.html")
 
 

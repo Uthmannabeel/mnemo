@@ -11,7 +11,8 @@ the architecture that earns it, then prove it runs on Alibaba Cloud.
 > they don't *learn* from it. Mnemo is a cognitive memory architecture — and I can
 > prove it makes better decisions the longer it runs."
 
-Show the dashboard hero: the three-line accuracy chart already rendered.
+Open on the LANDING PAGE (http://47.84.232.162:8000) — the 0→100 scoreboard is the
+first frame. Then click "Open the console" for the rest.
 
 ### 0:20–1:00 — The proof (console, Evidence section — both charts load on page open)
 - Point at the three lines of Experiment 1:

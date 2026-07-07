@@ -1,0 +1,121 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap');
+    .sans{font-family:'IBM Plex Sans','Segoe UI',sans-serif}
+    .mono{font-family:'IBM Plex Mono',Consolas,monospace}
+  </style>
+
+  <rect width="1200" height="800" fill="#F6F7F8"/>
+
+  <!-- header -->
+  <text x="48" y="52" class="mono" font-size="17" font-weight="600" letter-spacing="2.4" fill="#171A20">MNEMO</text>
+  <text x="128" y="52" class="sans" font-size="13" fill="#5B6472">memory engine for support triage · MemoryAgent track · Qwen Cloud on Alibaba Cloud</text>
+
+  <text x="1152" y="40" text-anchor="end" class="mono" font-size="12.5" font-weight="600" fill="#2140C7">no-memory 21%  →  episodic-RAG 60%  →  mnemo 71% / 100%</text>
+  <text x="1152" y="58" text-anchor="end" class="mono" font-size="11" fill="#0E7B4F">live Qwen3.7-Max: 0% zero-shot on org conventions → 100% with memory · 50% smaller context</text>
+  <text x="1152" y="74" text-anchor="end" class="sans" font-size="10.5" fill="#8B94A3">deterministic 3-arm ablation · same retrieval budget · enforced in CI</text>
+
+  <line x1="48" y1="92" x2="1152" y2="92" stroke="#E3E6EA"/>
+
+  <!-- ============ LEFT: live decision loop ============ -->
+  <text x="70" y="126" class="mono" font-size="11" font-weight="600" letter-spacing="1.4" fill="#5B6472">LIVE DECISION LOOP</text>
+
+  <rect x="70" y="142" width="310" height="52" rx="8" fill="#FFFFFF" stroke="#E3E6EA"/>
+  <text x="225" y="173" text-anchor="middle" class="sans" font-size="14" font-weight="500" fill="#171A20">Incoming support ticket</text>
+
+  <rect x="70" y="232" width="310" height="72" rx="8" fill="#FFFFFF" stroke="#2140C7" stroke-width="1.4"/>
+  <text x="225" y="262" text-anchor="middle" class="sans" font-size="14.5" font-weight="600" fill="#171A20">TriageAgent</text>
+  <text x="225" y="283" text-anchor="middle" class="mono" font-size="11" fill="#2140C7">reasons over memory · Qwen3.7-Max</text>
+
+  <rect x="70" y="342" width="310" height="86" rx="8" fill="#FFFFFF" stroke="#E3E6EA"/>
+  <text x="90" y="368" class="sans" font-size="13.5" font-weight="600" fill="#171A20">Decision ledger</text>
+  <text x="90" y="388" class="mono" font-size="10.5" fill="#5B6472">01 RETRIEVED · 02 FIRED rule · 03 DECISION</text>
+  <text x="90" y="405" class="sans" font-size="11" fill="#8B94A3">every decision cites the memories that justified it</text>
+
+  <rect x="70" y="466" width="310" height="52" rx="8" fill="#FFFFFF" stroke="#E3E6EA"/>
+  <text x="225" y="490" text-anchor="middle" class="sans" font-size="13.5" font-weight="500" fill="#171A20">Outcome / correction</text>
+  <text x="225" y="507" text-anchor="middle" class="sans" font-size="10.5" fill="#8B94A3">confirm or correct — either way it learns</text>
+
+  <!-- left arrows -->
+  <g stroke="#8B94A3" stroke-width="1.4" fill="none">
+    <path d="M225 194 v32"/><path d="M225 304 v32"/><path d="M225 428 v32"/>
+  </g>
+  <g fill="#8B94A3">
+    <path d="M225 232 l-4 -7 h8 z"/><path d="M225 342 l-4 -7 h8 z"/><path d="M225 466 l-4 -7 h8 z"/>
+  </g>
+
+  <!-- ============ RIGHT: four-tier memory ============ -->
+  <text x="700" y="126" class="mono" font-size="11" font-weight="600" letter-spacing="1.4" fill="#5B6472">FOUR-TIER MEMORY</text>
+
+  <rect x="700" y="142" width="440" height="58" rx="8" fill="#FFFFFF" stroke="#E3E6EA"/>
+  <text x="722" y="167" class="sans" font-size="13.5" font-weight="600" fill="#171A20">Episodic</text>
+  <text x="722" y="186" class="sans" font-size="11" fill="#5B6472">raw timestamped events · pgvector · the source of truth</text>
+
+  <!-- dreaming loop -->
+  <rect x="680" y="238" width="480" height="300" rx="10" fill="none" stroke="#2140C7" stroke-width="1.2" stroke-dasharray="5 5"/>
+  <text x="700" y="264" class="mono" font-size="10.5" font-weight="600" letter-spacing="1.2" fill="#2140C7">DREAMING LOOP · SCHEDULED ON FUNCTION COMPUTE</text>
+
+  <rect x="700" y="280" width="440" height="88" rx="8" fill="#EEF1FC" stroke="#2140C7" stroke-width="1.2"/>
+  <text x="920" y="308" text-anchor="middle" class="sans" font-size="14" font-weight="600" fill="#171A20">Consolidator — Qwen3.7-Max</text>
+  <text x="920" y="328" text-anchor="middle" class="sans" font-size="11" fill="#5B6472">reflect over history · distil rules and facts · credit-assign</text>
+  <text x="920" y="345" text-anchor="middle" class="sans" font-size="11" fill="#5B6472">recency-weighted evidence · conflict-resolve · decay</text>
+
+  <rect x="700" y="440" width="208" height="72" rx="8" fill="#FFFFFF" stroke="#E3E6EA"/>
+  <text x="804" y="468" text-anchor="middle" class="sans" font-size="13" font-weight="600" fill="#171A20">Semantic</text>
+  <text x="804" y="487" text-anchor="middle" class="sans" font-size="11" fill="#5B6472">distilled facts</text>
+
+  <rect x="932" y="440" width="208" height="72" rx="8" fill="#FFFFFF" stroke="#2140C7" stroke-width="1.2"/>
+  <text x="1036" y="468" text-anchor="middle" class="sans" font-size="13" font-weight="600" fill="#171A20">Procedural</text>
+  <text x="1036" y="487" text-anchor="middle" class="mono" font-size="10.5" fill="#2140C7">learned IF→THEN rules</text>
+
+  <!-- memory arrows -->
+  <g stroke="#8B94A3" stroke-width="1.4" fill="none">
+    <path d="M920 200 v78"/>
+    <path d="M860 368 L810 438"/>
+    <path d="M980 368 L1030 438"/>
+  </g>
+  <g fill="#8B94A3">
+    <path d="M920 280 l-4 -7 h8 z"/>
+    <path d="M810 440 l-6.5 -3.5 l5 -5 z"/>
+    <path d="M1030 440 l-1.5 -8.5 l6.5 3.5 z"/>
+  </g>
+  <text x="932" y="230" class="sans" font-size="10.5" fill="#8B94A3">reflect over full history</text>
+  <text x="920" y="416" text-anchor="middle" class="sans" font-size="10.5" fill="#8B94A3">promote what endures · supersede what changed</text>
+
+  <!-- write episode: outcome -> episodic -->
+  <g stroke="#5B6472" stroke-width="1.4" fill="none">
+    <path d="M380 492 H560 V171 H698"/>
+  </g>
+  <path d="M700 171 l-7 -4 v8 z" fill="#5B6472"/>
+  <text x="452" y="484" class="sans" font-size="10.5" fill="#5B6472">write raw episode</text>
+
+  <!-- retrieve: tiers -> agent (the budgeted read) -->
+  <g stroke="#2140C7" stroke-width="1.8" fill="none">
+    <path d="M700 476 H620 V268 H382"/>
+    <path d="M700 171 H660 V264"/>
+  </g>
+  <path d="M380 268 l7 -4 v8 z" fill="#2140C7"/>
+  <text x="470" y="250" class="mono" font-size="10.5" font-weight="600" fill="#2140C7">retrieve · finite context budget</text>
+  <text x="470" y="290" class="sans" font-size="10" fill="#8B94A3">a few sharp rules beat a pile of raw history</text>
+
+  <!-- workspaces note -->
+  <rect x="70" y="556" width="310" height="64" rx="8" fill="#FFFFFF" stroke="#E3E6EA"/>
+  <text x="90" y="580" class="sans" font-size="12.5" font-weight="600" fill="#171A20">Isolated workspaces</text>
+  <text x="90" y="598" class="sans" font-size="10.5" fill="#5B6472">the same ticket routes differently per org —</text>
+  <text x="90" y="612" class="sans" font-size="10.5" fill="#5B6472">each cites its own learned policy</text>
+
+  <!-- ============ Alibaba Cloud ribbon ============ -->
+  <rect x="48" y="668" width="1104" height="84" rx="10" fill="#FFFFFF" stroke="#E3E6EA"/>
+  <text x="70" y="696" class="mono" font-size="10.5" font-weight="600" letter-spacing="1.4" fill="#D26A1B">ALIBABA CLOUD</text>
+
+  <rect x="70" y="708" width="345" height="30" rx="6" fill="#F6F7F8" stroke="#E3E6EA"/>
+  <text x="86" y="728" class="sans" font-size="11.5" fill="#171A20">Model Studio / DashScope — Qwen3.7-Max + embeddings</text>
+
+  <rect x="432" y="708" width="260" height="30" rx="6" fill="#F6F7F8" stroke="#E3E6EA"/>
+  <text x="448" y="728" class="sans" font-size="11.5" fill="#171A20">RDS for PostgreSQL — pgvector</text>
+
+  <rect x="710" y="708" width="422" height="30" rx="6" fill="#F6F7F8" stroke="#E3E6EA"/>
+  <text x="726" y="728" class="sans" font-size="11.5" fill="#171A20">ECS / Function Compute — FastAPI + scheduled Dreaming cron</text>
+
+  <text x="48" y="782" class="sans" font-size="10.5" fill="#8B94A3">github.com/Uthmannabeel/mnemo · MIT</text>
+</svg>

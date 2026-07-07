@@ -74,6 +74,6 @@ the Dreaming loop to Qwen3.7-Max's thousand-step long-horizon execution.
 ## Links
 - Repo: https://github.com/Uthmannabeel/mnemo (MIT license)
 - Architecture diagram: docs/architecture.svg + docs/architecture.png (Devpost gallery)
+- Live product (landing + console): http://47.84.232.162:8000 — Alibaba Cloud ECS, Singapore
 - Demo video (~3 min): <youtube url — fill in>
-- Live dashboard: <alibaba cloud url — fill in>
 - Proof-of-deployment recording: <url — fill in>
