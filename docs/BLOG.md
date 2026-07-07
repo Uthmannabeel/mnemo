@@ -172,12 +172,18 @@ tickets — invoices included — go to the white-glove *technical* team. Acme's
 issues" are a known *shipping*-feed bug. No amount of model quality gets these right
 zero-shot; they're not in any training distribution.
 
-Two arms, same tickets: **Qwen3.7-Max alone** vs **Qwen3.7-Max + Mnemo**. The alone arm
-stays wrong on convention tickets forever. The memory arm learns them from feedback —
-in validation its convention accuracy climbs from 14% to 71% in five sessions, and every
-one of the five conventions ends up as an explicit, inspectable procedural rule
-("IF ticket mentions 'refund' THEN category=account"). That's the claim in one line:
-**frontier models can't know your organization — memory is how they learn it.**
+Two arms, same tickets, real Qwen3.7-Max on both: **alone** vs **with Mnemo**. The
+live numbers were starker than our own validation predicted. Zero-shot scored **98%
+on plain tickets** — and **0% on convention tickets, four sessions straight**. Not
+low. Zero. With Mnemo, the same model climbed 14% → 71% → 86% → **100%**, a +86-point
+final gap, while keeping 95% on plain tickets. And the consolidation pass wrote its
+own runbook — readable rules with rationales:
+
+> `IF text mentions 'Project Falcon' THEN category=technical (Project Falcon
+> hardware, workspaces, and add-ons are technical)`
+
+Every one of the 150 predictions is committed to the repo. That's the claim in one
+line: **frontier models can't know your organization — memory is how they learn it.**
 
 ---
 

@@ -30,12 +30,13 @@ Show the dashboard hero: the three-line accuracy chart already rendered.
 > "Under a finite context budget, a handful of distilled rules beat a pile of noisy
 > raw tickets — that's the context-rot problem Qwen's own models are built to fight."
 
-### (insert if live Exp-2 results are in) — the killer-question slide (~15s)
-> "And to the obvious objection — 'wouldn't Qwen alone ace this?' — we ran it. On
-> tickets governed by org conventions no model can know, zero-shot Qwen3.7-Max stays
-> wrong forever. With Mnemo's memory, the same model learns every convention."
-Show the `results/org_experiment.json` table / README Exp-2 section. Trim the
-architecture beat by ~15s to fit.
+### 1:30–1:50 — the killer-question slide (the strongest 20 seconds)
+> "The obvious objection: wouldn't Qwen alone ace this? We ran it — live, both arms
+> real Qwen3.7-Max. On ordinary tickets, zero-shot scores 98%. On tickets governed by
+> org conventions, it scores **zero** — four sessions straight. With Mnemo, the same
+> model reaches **100%**. Every one of the 150 predictions is in the repo."
+Show the live table in README's Experiment-2 section, then one distilled rule with
+its self-written rationale. Trim the architecture beat by ~20s to fit.
 
 ### 1:45–2:15 — Live triage with provenance (dashboard triage box)
 - Type: *"I was charged twice this month, please refund the duplicate charge."*

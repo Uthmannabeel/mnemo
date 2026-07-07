@@ -21,13 +21,14 @@ Two controlled experiments back the claim:
 - **Exp 1 (architecture ablation):** under a fixed per-decision context budget,
   21% (no memory) → 60% (episodic RAG) → **71% mean / 100% final** (Mnemo) — distilled
   rules beat raw retrieval when context is finite.
-- **Exp 2 (does memory help Qwen itself?):** tickets whose ground truth depends on
-  *organization conventions no model can know a priori* (refunds route to account
-  managers by policy; "Project Falcon" tickets go to the white-glove team…).
-  **Qwen3.7-Max zero-shot** stays wrong on them forever; **Qwen3.7-Max + Mnemo** learns
-  every convention from feedback — convention accuracy climbs 14% → 71% (+57 pt final
-  gap) in the pipeline validation, with all five conventions distilled into correct
-  rules (test-asserted).
+- **Exp 2 (does memory help Qwen itself? — LIVE, real Qwen3.7-Max both arms):**
+  tickets whose ground truth depends on *organization conventions no model can know a
+  priori* (refunds route to account managers by policy; "Project Falcon" tickets go to
+  the white-glove team…). Zero-shot Qwen3.7-Max: **98% on plain tickets, 0% on
+  convention tickets for four straight sessions**. The same model with Mnemo: **100%
+  by session 4** (+86 pt final gap). All five conventions distilled into readable
+  rules with self-written rationales; every one of the 150 predictions committed to
+  the repo for audit.
 - **Also test-enforced:** 50% smaller memory context per decision than raw RAG (token
   economics); **unlearning** — a changed org policy supersedes its stale rule within a
   few corrections; and **isolated workspaces** — the same ticket routes differently in

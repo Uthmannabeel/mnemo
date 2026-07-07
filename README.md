@@ -89,11 +89,31 @@ python -m app.eval.live_harness --yes    # live Qwen3.7-Max run (~160 calls), re
                                          # checkpointed to results/org_experiment.json
 ```
 
-Offline pipeline validation (deterministic mock, same code path): the memory arm's
-convention accuracy climbs **14% → 71%** (final-session gap **+57 pts**) while the
-no-memory arm stays flat — and all five conventions are distilled into correct
-procedural rules (asserted by `tests/test_org_learning.py`). The committed `results/`
-JSON from the live run includes every prediction for auditability.
+**Live result — real Qwen3.7-Max, both arms** (every prediction logged in
+[`backend/results/org_experiment.json`](backend/results/org_experiment.json)):
+
+```
+convention tickets:        S1   S2   S3   S4   S5
+qwen-alone (zero-shot)      0    0    0    0   14   mean  3%
+qwen+mnemo                 14   71   86  100  100   mean 74%    final gap: +86 pts
+
+plain tickets: zero-shot 98% · with mnemo 95%
+```
+
+Zero-shot Qwen3.7-Max scores **98% on ordinary tickets** — it is a superb model — and
+**0% on org conventions** for four straight sessions, because no amount of model
+quality can know Northwind's policies. With Mnemo, the *same model* reaches **100% by
+session 4**. The Dreaming loop's distilled rules are readable, with rationales it
+wrote itself:
+
+> `IF text mentions 'Project Falcon' THEN category=technical (Project Falcon hardware,
+> workspaces, and add-ons are technical)`
+> `IF text mentions requesting or processing a refund THEN category=account (refund
+> requests are handled under account management)`
+
+The deterministic offline pipeline (same code path, mock client) reproduces the shape
+for free in CI — `tests/test_org_learning.py` asserts all five conventions distill
+correctly on every push.
 
 > **The claim, precisely:** frontier models can't know your organization.
 > Mnemo makes Qwen3.7-Max learn it — measurably.
