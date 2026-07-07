@@ -189,16 +189,18 @@ line: **frontier models can't know your organization — memory is how they lear
 
 ## Running it on Alibaba Cloud
 
-The architecture maps cleanly onto Alibaba Cloud primitives:
+The live deployment is deliberately simple: a Docker container on an **ECS instance
+in Singapore**, talking to **Qwen3.7-Max and Qwen embeddings** through Model Studio's
+OpenAI-compatible endpoint (with `preserve_thinking` to keep the agent's reasoning
+coherent across turns). One gotcha worth passing on: qwen3.7-max is a thinking model,
+so the chat path must stream and aggregate — a plain non-streaming call fails.
 
-- **Qwen3.7-Max + Qwen embeddings** via Model Studio's DashScope OpenAI-compatible
-  endpoint (with `preserve_thinking` to keep the agent's reasoning coherent across turns).
-- **pgvector on RDS for PostgreSQL** for the episodic vector index.
-- **FastAPI on ECS or Function Compute** for the API and dashboard.
-- The **Dreaming loop as a scheduled Function Compute job** — which is the most
-  satisfying thing to watch: a serverless function waking up on a cron, reflecting on the
-  last few hours of tickets, and writing brand-new procedural rules into memory, entirely
-  on its own.
+The architecture is built to grow past that. The store is an abstraction with a
+**pgvector-on-RDS** backend for the episodic vector index, and the Dreaming loop
+ships as a **Function Compute handler** with a time trigger — so in production,
+consolidation is a serverless function waking up on a cron, reflecting on the last
+few hours of tickets, and writing brand-new procedural rules into memory, entirely
+on its own.
 
 That last part is the whole thesis made literal. The agent isn't just answering
 questions. While nothing is looking, it's turning experience into skill.
@@ -218,5 +220,8 @@ questions. While nothing is looking, it's turning experience into skill.
 Mnemo is open-source (MIT). If you're building agents that need to remember *and* learn,
 steal the architecture.
 
-*Built for the Global AI Hackathon with Qwen Cloud — MemoryAgent track. Repo, demo
-video, and the live dashboard in the links below.*
+*Built for the Global AI Hackathon with Qwen Cloud — MemoryAgent track.*
+
+- **Repo (MIT):** https://github.com/Uthmannabeel/mnemo
+- **Live console** (Alibaba Cloud ECS, Singapore): http://47.84.232.162:8000
+- **Demo video:** *(YouTube link)*

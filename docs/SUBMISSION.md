@@ -40,10 +40,12 @@ Two controlled experiments back the claim:
   confidence.
 - **Dreaming consolidation loop** — Qwen3.7-Max reflects over episodes, promotes durable
   knowledge upward, does **credit assignment**, **conflict resolution**, and **decay**.
-- **Qwen Cloud**: Qwen3.7-Max + Qwen embeddings via the DashScope OpenAI-compatible
-  endpoint (`preserve_thinking` for coherent agent reasoning).
-- **Alibaba Cloud**: FastAPI on ECS/Function Compute, pgvector on RDS for PostgreSQL,
-  the Dreaming loop as a scheduled Function Compute job.
+- **Qwen Cloud**: Qwen3.7-Max + Qwen embeddings via the Model Studio
+  OpenAI-compatible endpoint (`preserve_thinking` for coherent agent reasoning).
+- **Alibaba Cloud**: live on an ECS instance in Singapore (Docker, FastAPI —
+  http://47.84.232.162:8000). The store abstraction also ships a pgvector-on-RDS
+  backend, and the Dreaming loop ships as a Function Compute handler
+  (`fc_dream.py`) for scheduled consolidation in production.
 - **Proof, not vibes**: a three-arm ablation harness + a regression test that fails if
   memory ever stops improving accuracy.
 
@@ -68,8 +70,8 @@ Multi-user memory isolation, procedural-rule promotion into callable tools, and 
 the Dreaming loop to Qwen3.7-Max's thousand-step long-horizon execution.
 
 ## Built with
-`python` · `qwen3.7-max` · `dashscope` · `qwen-embeddings` · `fastapi` · `pgvector` ·
-`alibaba-cloud-rds` · `alibaba-cloud-function-compute` · `chart.js`
+`python` · `qwen3.7-max` · `dashscope` · `qwen-embeddings` · `fastapi` ·
+`alibaba-cloud-ecs` · `alibaba-cloud-model-studio` · `pgvector` · `docker` · `chart.js`
 
 ## Links
 - Repo: https://github.com/Uthmannabeel/mnemo (MIT license)

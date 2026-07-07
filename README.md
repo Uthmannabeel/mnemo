@@ -13,6 +13,9 @@ experience and distils it into durable **semantic facts** and **procedural rules
 that steer future decisions. We don't just claim it learns; we **prove it** with a
 controlled three-arm experiment.
 
+**Live console:** http://47.84.232.162:8000 — running on Alibaba Cloud ECS
+(Singapore), real Qwen3.7-Max. *(Up for the judging window.)*
+
 ---
 
 ## The result (this is the whole point)
@@ -137,8 +140,9 @@ correctly on every push.
 `0.6·similarity + 0.15·recency(decay) + 0.15·importance + 0.10·confidence`, so
 memories decay if unused and strengthen when they prove useful.
 
-**Autonomy & maturity:** the Dreaming loop runs unattended (a scheduled Function
-Compute job). It performs **credit assignment** (rules that drove correct calls gain
+**Autonomy & maturity:** the Dreaming loop runs unattended — after each session on
+the live server, or on a schedule via the bundled Function Compute handler
+(`fc_dream.py`). It performs **credit assignment** (rules that drove correct calls gain
 confidence, wrong ones lose it and eventually deactivate), **conflict resolution**
 (a refined rule supersedes an outdated one instead of duplicating), and **decay**
 (unused memories fade). Every decision is **explainable** — it cites the exact
@@ -152,8 +156,9 @@ memory ids that justified it.
   reasoning (function-calling ready) and for the reflection/consolidation step,
   using `preserve_thinking` to keep reasoning context coherent across turns.
 - **Qwen embeddings** (`text-embedding-v4`) for the episodic vector index.
-- Deployed on **Alibaba Cloud**: FastAPI on ECS/Function Compute, **pgvector on
-  RDS for PostgreSQL**, Dreaming loop as a scheduled Function Compute trigger.
+- Deployed on **Alibaba Cloud**: live on ECS (Singapore) —
+  **http://47.84.232.162:8000** — with a pgvector-on-RDS store backend and a
+  Function Compute handler (`fc_dream.py`) for scheduled Dreaming in production.
 
 See [`docs/DEPLOY.md`](docs/DEPLOY.md) for the Alibaba Cloud deployment.
 

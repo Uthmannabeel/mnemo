@@ -9,18 +9,19 @@ Dreaming loop running as a serverless scheduled job.
 1. **Model Studio API key** — Model Studio console → API-KEY → *Create*. Note your
    region; the OpenAI-compatible base URL differs per region (see `.env.example`).
 2. Apply the **hackathon credit coupon** in Billing so Qwen calls are free.
-3. **RDS for PostgreSQL** instance with the `vector` extension enabled (Console →
-   RDS → *Extensions* → enable `vector`). Grab its connection string.
+3. *(Option B only)* **RDS for PostgreSQL** instance with the `vector` extension
+   enabled (Console → RDS → *Extensions* → enable `vector`). Grab its connection
+   string.
 
 Set these on whichever compute you use:
 
 ```
 DASHSCOPE_API_KEY=sk-...
-QWEN_BASE_URL=https://dashscope-us.aliyuncs.com/compatible-mode/v1   # your region
+QWEN_BASE_URL=https://<your-workspace>.<region>.maas.aliyuncs.com/compatible-mode/v1   # region/workspace-scoped
 QWEN_MODEL=qwen3.7-max
 MNEMO_OFFLINE=0
-MNEMO_STORE=postgres
-DATABASE_URL=postgresql://user:pass@<rds-host>:5432/mnemo
+MNEMO_STORE=memory                 # or postgres + DATABASE_URL for Option B
+# DATABASE_URL=postgresql://user:pass@<rds-host>:5432/mnemo
 ```
 
 ---
@@ -31,14 +32,16 @@ DATABASE_URL=postgresql://user:pass@<rds-host>:5432/mnemo
 # on an Ubuntu ECS instance, security group open on 8000
 git clone <your-repo> && cd mnemo/backend
 docker build -t mnemo .
-docker run -d --name mnemo -p 8000:8000 --env-file .env mnemo
+docker run -d --name mnemo --restart unless-stopped -p 8000:8000 --env-file .env mnemo
 
 curl http://<ecs-public-ip>:8000/health
-# {"status":"ok","qwen_model":"qwen3.7-max","store":"postgres","mode":"qwen-live"}
+# {"status":"ok","qwen_model":"qwen3.7-max","store":"memory","mode":"qwen-live"}
 ```
 
-The `mode: qwen-live` + `store: postgres` in the health response, filmed on the ECS
-public IP, is your deployment proof.
+The `mode: qwen-live` in the health response, filmed on the ECS public IP, is your
+deployment proof. `MNEMO_STORE=memory` is fine for a single-instance demo (no RDS
+needed); switch to `MNEMO_STORE=postgres` + `DATABASE_URL` when the Function Compute
+Dreaming cron needs to share memory with the API (Option B).
 
 ---
 
