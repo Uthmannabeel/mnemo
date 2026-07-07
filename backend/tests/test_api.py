@@ -55,10 +55,10 @@ def test_dashboard_loop():
     t0 = time.time(); c.post("/eval"); t1 = time.time(); c.post("/eval"); t2 = time.time()
     assert (t2 - t1) < max(0.25, (t1 - t0) / 4), f"first {t1-t0:.3f}s, cached {t2-t1:.3f}s"
 
-    # 5. landing page fronts the product; console lives at /console
-    assert c.get("/").status_code == 200
-    assert c.get("/console").status_code == 200
-    assert c.get("/static/architecture.svg").status_code == 200
+    # 5. the site: landing, evidence, how-it-works, console, shared assets
+    for path in ("/", "/evidence", "/how", "/console",
+                 "/static/architecture.svg", "/static/site.css", "/static/site.js"):
+        assert c.get(path).status_code == 200, path
 
 
 if __name__ == "__main__":

@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Evidence — Mnemo</title>
+<meta name="description" content="Two controlled experiments, four CI-enforced invariants, every prediction committed. The evidence behind Mnemo.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script>
+  (function(){var t=localStorage.getItem('mnemo-theme');
+  if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';
+  document.documentElement.dataset.theme=t;})();
+</script>
+<link rel="stylesheet" href="/static/site.css">
+</head>
+<body>
+
+<nav class="site">
+  <div class="wrap">
+    <a class="wordmark" href="/">MNEMO</a>
+    <div class="links">
+      <a href="/evidence" class="active hide-sm">Evidence</a>
+      <a href="/how" class="hide-sm">How it works</a>
+      <a href="https://github.com/Uthmannabeel/mnemo" class="hide-sm">GitHub</a>
+      <button class="themebtn" id="themeToggle" aria-label="Switch color theme">dark</button>
+      <a class="btn" href="/console">Open the console</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow">Evidence</div>
+    <h1>No demos-as-proof. <em>Controlled experiments, committed artifacts.</em></h1>
+    <p class="sub">Two experiments back every claim on this site. Both are seeded and deterministic offline;
+      the live run is committed to the repository down to the individual prediction. Four invariants run in CI
+      on every push — if learning ever regresses, the build fails.</p>
+  </div>
+</header>
+
+<!-- experiment 1 -->
+<section>
+  <div class="wrap">
+    <div class="eyebrow">Experiment 1 · Architecture ablation</div>
+    <h2>Does consolidation beat raw retrieval?</h2>
+    <p class="lede">Three arms, identical tickets, identical six-memory retrieval budget per decision.
+      The only variable is what the agent does with memory. 8 sessions × 25 tickets, seeded and noisy
+      (category-neutral filler pollutes cosine similarity — the realistic regime).</p>
+
+    <div class="board">
+      <div class="cap"><b>Per-session accuracy — deterministic offline run</b>
+        <span>reproduces byte-for-byte · MNEMO_OFFLINE=1</span></div>
+      <table class="score compact">
+        <thead><tr><th>arm</th><th>S1</th><th>S2</th><th>S3</th><th>S4</th><th>S5</th><th>S6</th><th>S7</th><th>S8</th><th>mean</th></tr></thead>
+        <tbody>
+          <tr class="dim"><td class="lbl">no memory (control)</td><td>28</td><td>24</td><td>16</td><td>12</td><td>24</td><td>24</td><td>16</td><td>24</td><td>21%</td></tr>
+          <tr class="dim"><td class="lbl">episodic RAG (vector DB only)</td><td>28</td><td>68</td><td>60</td><td>56</td><td>72</td><td>52</td><td>68</td><td>80</td><td>60%</td></tr>
+          <tr class="win"><td class="lbl">Mnemo (episodic + Dreaming)</td><td>20</td><td>72</td><td>72</td><td>64</td><td>84</td><td>72</td><td>84</td><td>100</td><td>71%</td></tr>
+        </tbody>
+      </table>
+      <p class="foot"><b>Token economics:</b> Mnemo reaches +10.5 pts over RAG while consuming a
+        <b>50% smaller</b> memory context per decision — 574 vs 1,155 characters. A few distilled rules
+        carry more signal than a pile of raw transcripts. That is the practical answer to context rot.</p>
+    </div>
+  </div>
+</section>
+
+<!-- experiment 2 -->
+<section>
+  <div class="wrap">
+    <div class="eyebrow">Experiment 2 · Organization conventions — LIVE</div>
+    <h2>Does memory help Qwen itself?</h2>
+    <p class="lede">The fair objection to any memory agent: wouldn't a frontier model ace this zero-shot?
+      On generic tickets — yes. So this experiment uses tickets whose correct routing depends on
+      <b>organization conventions no model can know a priori</b>: refunds route to account managers by
+      policy; "Project Falcon" tickets — invoices included — go to the white-glove technical team;
+      Acme's sync issues are a known shipping-feed bug.</p>
+
+    <div class="board">
+      <div class="cap"><b>Convention-ticket accuracy — real Qwen3.7-Max, both arms</b>
+        <span>live run · 5 sessions × 15 tickets · 150 predictions committed</span></div>
+      <table class="score">
+        <thead><tr><th>arm</th><th>S1</th><th>S2</th><th>S3</th><th>S4</th><th>S5</th></tr></thead>
+        <tbody>
+          <tr class="dim"><td class="lbl">Qwen3.7-Max, zero-shot</td><td>0</td><td>0</td><td>0</td><td>0</td><td>14</td></tr>
+          <tr class="win"><td class="lbl">Qwen3.7-Max + Mnemo</td><td>14</td><td>71</td><td>86</td><td>100</td><td>100</td></tr>
+        </tbody>
+      </table>
+      <p class="foot">On plain tickets both arms stay high — zero-shot <b>98%</b>, with Mnemo <b>95%</b> —
+        proving the model is excellent and the gap is pure organizational knowledge. Final-session gap:
+        <b>+86 points</b>.
+        <a href="https://github.com/Uthmannabeel/mnemo/blob/main/backend/results/org_experiment.json">Audit all 150 predictions →</a></p>
+    </div>
+
+    <h2 style="margin-top:56px">The rules Qwen wrote for itself</h2>
+    <p class="lede">During consolidation, Qwen3.7-Max distilled every convention into a readable rule —
+      rationales included, unedited output from the live run:</p>
+    <div style="margin-top:26px">
+      <blockquote>IF text mentions 'Project Falcon' THEN category=technical
+        <span class="why">(Project Falcon hardware, workspaces, and add-ons are technical)</span></blockquote>
+      <blockquote>IF text mentions requesting or processing a refund THEN category=account
+        <span class="why">(refund requests are handled under account management)</span></blockquote>
+      <blockquote>IF text contains 'Acme' OR 'warehouse feed' THEN category=shipping
+        <span class="why">(Acme and warehouse integrations are tied to shipping logistics)</span></blockquote>
+      <blockquote>IF text contains 'purchase order' THEN category=billing
+        <span class="why">(purchase order tracking and arrivals are managed by billing)</span></blockquote>
+      <blockquote>IF text contains 'beta' AND ('crash' OR 'break' OR 'logging out' OR 'search bar') THEN category=feedback
+        <span class="why">(beta build issues are treated as product feedback)</span></blockquote>
+    </div>
+  </div>
+</section>
+
+<!-- invariants -->
+<section>
+  <div class="wrap">
+    <div class="eyebrow">Enforced in CI</div>
+    <h2>Four invariants. Every push.</h2>
+    <p class="lede">Claims decay unless something guards them. These assertions run on every commit —
+      GitHub Actions, fresh machine, ~20 seconds:</p>
+    <div class="grid2">
+      <div class="card"><div class="k">tests/test_learning.py</div>
+        <h3>Learning ordering + token economics</h3>
+        <p>no-memory &lt; episodic-RAG &lt; Mnemo; the curve climbs; Mnemo's context is &lt;80% of RAG's. The core thesis, as an assertion.</p></div>
+      <div class="card"><div class="k">tests/test_org_learning.py</div>
+        <h3>Conventions distill correctly</h3>
+        <p>All five org conventions end up as procedural rules with the org's routing — not the surface reading.</p></div>
+      <div class="card"><div class="k">tests/test_adaptation.py</div>
+        <h3>Unlearning</h3>
+        <p>After a policy flip, the refund rule ends up citing the new category, with lineage to the retired rule, within three sessions of corrections.</p></div>
+      <div class="card"><div class="k">tests/test_api.py</div>
+        <h3>The product loop</h3>
+        <p>Seed → fired-rule provenance → feedback actually reinforces → workspaces isolate. The console's whole story, asserted end-to-end.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- reproduce -->
+<section>
+  <div class="wrap">
+    <div class="eyebrow">Reproduce it</div>
+    <h2>Two seconds. No API key. No trust.</h2>
+    <pre class="cmd"><span class="c"># clone and run the full 3-arm ablation, deterministic:</span>
+git clone https://github.com/Uthmannabeel/mnemo && cd mnemo/backend
+pip install -r requirements.txt
+MNEMO_OFFLINE=1 python -m app.eval.harness
+
+<span class="c"># the org-conventions pipeline, offline:</span>
+MNEMO_OFFLINE=1 python -m app.eval.live_harness
+
+<span class="c"># with a Model Studio key, the same code paths run live Qwen3.7-Max:</span>
+python -m app.eval.live_harness --yes</pre>
+    <div class="builton">
+      <a class="chip" href="https://github.com/Uthmannabeel/mnemo/blob/main/backend/results/org_experiment.json">results/org_experiment.json — live run</a>
+      <a class="chip" href="https://github.com/Uthmannabeel/mnemo/tree/main/backend/tests">backend/tests — all four suites</a>
+      <a class="chip" href="https://github.com/Uthmannabeel/mnemo/actions">CI runs</a>
+    </div>
+  </div>
+</section>
+
+<div class="wrap">
+  <div class="pagenav">
+    <a href="/how"><small>Next</small>How it works — four tiers, the Dreaming loop, the deployment</a>
+    <a href="/console"><small>Or</small>Open the console — seed a workload and verify it live</a>
+  </div>
+</div>
+
+<footer class="site">
+  <div class="wrap">
+    <span class="mono">MNEMO</span>
+    <a href="/evidence">Evidence</a>
+    <a href="/how">How it works</a>
+    <a href="/console">Console</a>
+    <a href="https://github.com/Uthmannabeel/mnemo">GitHub</a>
+    <span>MIT</span>
+    <span style="margin-left:auto">Global AI Hackathon with Qwen Cloud · MemoryAgent track</span>
+  </div>
+</footer>
+
+<script src="/static/site.js"></script>
+</body>
+</html>

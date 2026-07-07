@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>How it works — Mnemo</title>
+<meta name="description" content="Four memory tiers modeled on human cognition, a Dreaming consolidation loop powered by Qwen3.7-Max, and budgeted retrieval — deployed on Alibaba Cloud.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script>
+  (function(){var t=localStorage.getItem('mnemo-theme');
+  if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';
+  document.documentElement.dataset.theme=t;})();
+</script>
+<link rel="stylesheet" href="/static/site.css">
+<style>
+  table.tiers{border-collapse:collapse;width:100%;min-width:640px}
+  .tiers th{font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--faint);text-align:left;padding:14px 18px 10px 0;border-bottom:1px solid var(--border)}
+  .tiers td{font-size:13.5px;padding:12px 18px 12px 0;border-bottom:1px solid var(--border);color:var(--muted);vertical-align:top}
+  .tiers tr:last-child td{border-bottom:0}
+  .tiers td:first-child{font-family:var(--mono);font-size:12.5px;font-weight:600;color:var(--ink);white-space:nowrap}
+</style>
+</head>
+<body>
+
+<nav class="site">
+  <div class="wrap">
+    <a class="wordmark" href="/">MNEMO</a>
+    <div class="links">
+      <a href="/evidence" class="hide-sm">Evidence</a>
+      <a href="/how" class="active hide-sm">How it works</a>
+      <a href="https://github.com/Uthmannabeel/mnemo" class="hide-sm">GitHub</a>
+      <button class="themebtn" id="themeToggle" aria-label="Switch color theme">dark</button>
+      <a class="btn" href="/console">Open the console</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow">How it works</div>
+    <h1>Modeled on the memory <em>you already have.</em></h1>
+    <p class="sub">Humans don't keep one bucket of memories. We live through events, consolidate the useful
+      ones in our sleep, and act from distilled habits. Mnemo copies that flow — with Qwen3.7-Max doing
+      the dreaming.</p>
+  </div>
+</header>
+
+<!-- the loop -->
+<section>
+  <div class="wrap">
+    <div class="eyebrow">The loop</div>
+    <h2>Experience → Consolidate → Decide.</h2>
+    <div class="grid3">
+      <div class="card"><div class="k">01 · Experience</div><h3>Every outcome becomes an episode</h3>
+        <p>Each routed ticket and its confirmed or corrected outcome is written as a raw, timestamped
+          episode — the immutable source of truth, embedded with Qwen text-embedding-v4 and indexed in pgvector.</p></div>
+      <div class="card"><div class="k">02 · Consolidate</div><h3>The Dreaming loop</h3>
+        <p>On a schedule, Qwen3.7-Max reflects over episodic history and distils durable knowledge upward:
+          semantic facts and procedural IF→THEN rules, each carrying provenance back to the episodes that earned it.</p></div>
+      <div class="card"><div class="k">03 · Decide</div><h3>Budgeted retrieval</h3>
+        <p>New tickets retrieve a <em>finite</em> working set — a few high-confidence rules, a fact, the closest
+          precedents — re-ranked by similarity, recency, importance, and confidence. Every decision cites what fired.</p></div>
+    </div>
+
+    <figure class="diagram" style="margin-left:0;margin-right:0">
+      <img src="/static/architecture.svg" alt="Mnemo architecture: live decision loop, four-tier memory, Dreaming loop on Function Compute, Alibaba Cloud services" loading="lazy">
+      <figcaption>The full loop: decisions cite memory; outcomes become episodes; Dreaming turns episodes into rules.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- tiers -->
+<section>
+  <div class="wrap">
+    <div class="eyebrow">The four tiers</div>
+    <h2>Separate stores for separate kinds of knowing.</h2>
+    <div class="versus" style="margin-top:30px">
+      <table class="tiers">
+        <thead><tr><th>Tier</th><th>Holds</th><th>Written by</th><th>Read for</th></tr></thead>
+        <tbody>
+          <tr><td>WORKING</td><td>the current session's scratchpad</td><td>the live turn</td><td>in-context reasoning</td></tr>
+          <tr><td>EPISODIC</td><td>raw timestamped events — what actually happened</td><td>every decision + outcome</td><td>grounding and precedent</td></tr>
+          <tr><td>SEMANTIC</td><td>distilled facts and preferences</td><td>the Dreaming loop</td><td>cheap, high-signal context</td></tr>
+          <tr><td>PROCEDURAL</td><td>learned IF→THEN rules with confidence scores</td><td>the Dreaming loop</td><td>steering decisions</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- what makes consolidation grown-up -->
+<section>
+  <div class="wrap">
+    <div class="eyebrow">Inside the Dreaming loop</div>
+    <h2>Consolidation is not an INSERT statement.</h2>
+    <div class="grid4">
+      <div class="card"><div class="k">Credit assignment</div>
+        <p>Rules that drive correct decisions gain confidence; rules that fire wrongly lose it, and below a
+          threshold they deactivate. Trust tracks reality.</p></div>
+      <div class="card"><div class="k">Conflict resolution</div>
+        <p>When new evidence contradicts a rule — the org changed a policy — the refined rule supersedes the
+          stale one, keeping a lineage link instead of piling up duplicates.</p></div>
+      <div class="card"><div class="k">Recency-weighted evidence</div>
+        <p>Recent experience outweighs stale experience, and corrected mistakes count double. This is what
+          lets unlearning converge in sessions, not months.</p></div>
+      <div class="card"><div class="k">Decay</div>
+        <p>Memories that go unused fade in retrieval weight. The store stays sharp instead of growing into
+          a junk drawer.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- deployment -->
+<section>
+  <div class="wrap">
+    <div class="eyebrow">Deployment</div>
+    <h2>Production topology on Alibaba Cloud.</h2>
+    <p class="lede">Everything you see on this site is served by this stack, live:</p>
+    <div class="grid3">
+      <div class="card"><div class="k">Model Studio</div><h3>Qwen3.7-Max + embeddings</h3>
+        <p>OpenAI-compatible DashScope endpoint, streaming (the Max tier is thinking-only), preserve_thinking
+          for coherent agent turns, text-embedding-v4 pinned to the vector schema.</p></div>
+      <div class="card"><div class="k">ECS · Singapore</div><h3>The engine + this site</h3>
+        <p>FastAPI in Docker. Four-tier memory, the triage agent, the console, and these pages — one deployable.</p></div>
+      <div class="card"><div class="k">Function Compute</div><h3>Scheduled dreaming</h3>
+        <p>The consolidation pass runs as a serverless cron (fc_dream.handler) sharing state through RDS pgvector —
+          the agent accumulates experience with no one watching.</p></div>
+    </div>
+    <div class="builton">
+      <span class="chip">FastAPI · Python 3.11</span>
+      <span class="chip">pgvector on RDS PostgreSQL</span>
+      <span class="chip">Docker · one image, API + cron</span>
+      <span class="chip">GitHub Actions CI</span>
+      <span class="chip">MIT license</span>
+    </div>
+  </div>
+</section>
+
+<div class="wrap">
+  <div class="cta-final">
+    <h2>Now watch it do all of this, live.</h2>
+    <p>Seed the Northwind workspace, route a ticket, and read the decision ledger — retrieval, the fired
+      rule, the call, and your teaching, as a numbered trace.</p>
+    <a class="btn" href="/console">Open the live console</a>
+  </div>
+  <div class="pagenav">
+    <a href="/evidence"><small>Back</small>Evidence — both experiments, methodology, committed results</a>
+    <a href="/"><small>Home</small>Mnemo — the memory engine for support triage</a>
+  </div>
+</div>
+
+<footer class="site">
+  <div class="wrap">
+    <span class="mono">MNEMO</span>
+    <a href="/evidence">Evidence</a>
+    <a href="/how">How it works</a>
+    <a href="/console">Console</a>
+    <a href="https://github.com/Uthmannabeel/mnemo">GitHub</a>
+    <span>MIT</span>
+    <span style="margin-left:auto">Global AI Hackathon with Qwen Cloud · MemoryAgent track</span>
+  </div>
+</footer>
+
+<script src="/static/site.js"></script>
+</body>
+</html>

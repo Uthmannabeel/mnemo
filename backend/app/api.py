@@ -66,6 +66,18 @@ def console() -> FileResponse:
     return FileResponse(_STATIC / "index.html")
 
 
+@app.get("/evidence")
+def evidence_page() -> FileResponse:
+    """Deep dive: both experiments, methodology, CI invariants, reproduction."""
+    return FileResponse(_STATIC / "evidence.html")
+
+
+@app.get("/how")
+def how_page() -> FileResponse:
+    """Architecture: the four tiers, the Dreaming loop, the deployment topology."""
+    return FileResponse(_STATIC / "how.html")
+
+
 @app.get("/health")
 def health() -> dict:
     s = get_settings()
