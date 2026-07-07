@@ -3,7 +3,14 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Mnemo — memory engine</title>
+<title>Mnemo — console</title>
+<script>
+  (function(){
+    var t = localStorage.getItem('mnemo-theme');
+    if(!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    document.documentElement.dataset.theme = t;
+  })();
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -16,8 +23,17 @@
     --accent:#2140C7; --accent-weak:#EEF1FC;
     --good:#0E7B4F; --good-weak:#E9F5EF;
     --bad:#B42318; --bad-weak:#FBEAE7;
+    --chart-dim:#C1C7CF; --chart-mid:#7A8494; --chart-grid:#EDEFF2;
     --sans:'IBM Plex Sans',-apple-system,'Segoe UI',sans-serif;
     --mono:'IBM Plex Mono',ui-monospace,'Cascadia Mono',Consolas,monospace;
+  }
+  [data-theme="dark"]{
+    --bg:#0E1013; --surface:#15181D; --border:#242932; --border-strong:#3A414D;
+    --ink:#E9ECF1; --muted:#9AA3B0; --faint:#68717E;
+    --accent:#7C96FF; --accent-weak:#1B2236;
+    --good:#43C98D; --good-weak:#12291E;
+    --bad:#F87168; --bad-weak:#31191B;
+    --chart-dim:#3F4652; --chart-mid:#6B7482; --chart-grid:#20242C;
   }
   *{box-sizing:border-box}
   html{-webkit-font-smoothing:antialiased}
@@ -150,6 +166,8 @@
     </select>
   </label>
   <div class="env mono" id="env"><span class="dot off"></span>connecting</div>
+  <button class="mono" id="themeToggle" aria-label="Switch color theme"
+    style="font-size:11px;letter-spacing:.06em;color:var(--muted);background:transparent;border:1px solid var(--border-strong);border-radius:6px;padding:4px 10px;cursor:pointer">dark</button>
   <a class="mono" style="font-size:11.5px" href="https://github.com/Uthmannabeel/mnemo">source</a>
 </header>
 
@@ -393,20 +411,22 @@ const endLabels = {
     ctx.restore();
   }
 };
+const cssv = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
 function lineOpts(){
   return {
     responsive:true, maintainAspectRatio:false, animation:false,
     layout:{padding:{right:64}},
     plugins:{legend:{display:false}, tooltip:{displayColors:false}},
     scales:{
-      y:{min:0,max:100,ticks:{color:'#8B94A3',font:{family:'IBM Plex Mono',size:10},callback:v=>v+'%',stepSize:25},
-         grid:{color:'#EDEFF2'},border:{display:false}},
-      x:{ticks:{color:'#8B94A3',font:{family:'IBM Plex Mono',size:10}},grid:{display:false},border:{color:'#E3E6EA'}}
+      y:{min:0,max:100,ticks:{color:cssv('--faint'),font:{family:'IBM Plex Mono',size:10},callback:v=>v+'%',stepSize:25},
+         grid:{color:cssv('--chart-grid')},border:{display:false}},
+      x:{ticks:{color:cssv('--faint'),font:{family:'IBM Plex Mono',size:10}},grid:{display:false},border:{color:cssv('--border')}}
     },
     elements:{point:{radius:2.5,hoverRadius:4},line:{tension:0,borderWidth:2}}
   };
 }
 const pct = a => a.map(v=>Math.round(v*100));
+let c1=null, c2=null;
 
 async function evidence(){
   try{
@@ -414,20 +434,23 @@ async function evidence(){
       (await fetch(API+'/eval',{method:'POST'})).json(),
       (await fetch(API+'/eval2',{method:'POST'})).json(),
     ]);
+    const ds = (label,data,color)=>({label, data, borderColor:color, backgroundColor:color});
+    if(c1) c1.destroy();
     const labels1 = r1.arms.full.accuracy_by_session.map((_,i)=>'S'+(i+1));
-    new Chart($('chart1'),{type:'line',plugins:[endLabels],options:lineOpts(),data:{labels:labels1,datasets:[
-      {label:'no memory', data:pct(r1.arms.none.accuracy_by_session), borderColor:'#C1C7CF', backgroundColor:'#C1C7CF'},
-      {label:'episodic',  data:pct(r1.arms.episodic.accuracy_by_session), borderColor:'#7A8494', backgroundColor:'#7A8494'},
-      {label:'mnemo',     data:pct(r1.arms.full.accuracy_by_session), borderColor:'#2140C7', backgroundColor:'#2140C7'},
+    c1 = new Chart($('chart1'),{type:'line',plugins:[endLabels],options:lineOpts(),data:{labels:labels1,datasets:[
+      ds('no memory', pct(r1.arms.none.accuracy_by_session), cssv('--chart-dim')),
+      ds('episodic',  pct(r1.arms.episodic.accuracy_by_session), cssv('--chart-mid')),
+      ds('mnemo',     pct(r1.arms.full.accuracy_by_session), cssv('--accent')),
     ]}});
     const f=r1.arms.full, e=r1.arms.episodic;
     $('take1').innerHTML = `Distilled rules beat raw retrieval under the same budget: <b>${Math.round(f.mean*100)}%</b> vs <b>${Math.round(e.mean*100)}%</b> mean, <b>${Math.round(f.last*100)}%</b> by the final session.`;
 
     const a2 = r2.arms['qwen-alone'].per_session, m2 = r2.arms['qwen+mnemo'].per_session;
     const labels2 = m2.map(s=>'S'+s.session);
-    new Chart($('chart2'),{type:'line',plugins:[endLabels],options:lineOpts(),data:{labels:labels2,datasets:[
-      {label:'zero-shot', data:a2.map(s=>Math.round(s.convention_acc*100)), borderColor:'#C1C7CF', backgroundColor:'#C1C7CF'},
-      {label:'with mnemo',data:m2.map(s=>Math.round(s.convention_acc*100)), borderColor:'#2140C7', backgroundColor:'#2140C7'},
+    if(c2) c2.destroy();
+    c2 = new Chart($('chart2'),{type:'line',plugins:[endLabels],options:lineOpts(),data:{labels:labels2,datasets:[
+      ds('zero-shot', a2.map(s=>Math.round(s.convention_acc*100)), cssv('--chart-dim')),
+      ds('with mnemo',m2.map(s=>Math.round(s.convention_acc*100)), cssv('--accent')),
     ]}});
     const h2 = r2.headline;
     $('take2').innerHTML = `On convention tickets the zero-shot arm never improves; with memory the same model reaches <b>${Math.round(r2.arms['qwen+mnemo'].convention_last*100)}%</b> — a <b>+${Math.round(h2.convention_gap_last_session*100)} pt</b> final-session gap${r2.mode==='live-qwen'?'':' (offline pipeline validation; live run: <span class="mono">app.eval.live_harness --yes</span>)'}.`;
@@ -441,6 +464,16 @@ document.querySelectorAll('.chips button').forEach(b=>{
   b.onclick = ()=>{ $('ticket').value = b.dataset.t; triage(); };
 });
 const PRIMER_HTML = $('ledger').innerHTML;  // captured at load, restored on switch
+const themeBtn = $('themeToggle');
+function syncThemeBtn(){ themeBtn.textContent = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'; }
+themeBtn.onclick = ()=>{
+  const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+  document.documentElement.dataset.theme = next;
+  localStorage.setItem('mnemo-theme', next);
+  syncThemeBtn();
+  evidence();  // redraw charts with the new theme's colors (endpoints are cached — instant)
+};
+syncThemeBtn();
 $('ws').onchange = ()=>{
   // A decision belongs to the workspace that made it — reset the bench on switch.
   $('stripNote').textContent=''; $('teach').hidden=true; last=null;
