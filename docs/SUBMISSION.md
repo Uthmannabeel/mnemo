@@ -79,3 +79,9 @@ the Dreaming loop to Qwen3.7-Max's thousand-step long-horizon execution.
 - Live product (landing + console): http://47.84.232.162:8000 — Alibaba Cloud ECS, Singapore
 - Demo video (~3 min): <youtube url — fill in>
 - Proof-of-deployment recording: <url — fill in>
+- Alibaba Cloud services/API usage in code (required with the proof):
+  https://github.com/Uthmannabeel/mnemo/blob/main/backend/app/qwen_client.py
+  (Qwen3.7-Max + Qwen embeddings via Model Studio) and
+  https://github.com/Uthmannabeel/mnemo/blob/main/backend/fc_dream.py
+  (Function Compute handler)
+- Blog post (Blog Post Award): <published url — fill in>

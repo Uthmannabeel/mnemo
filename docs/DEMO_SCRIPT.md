@@ -39,10 +39,14 @@ first frame. Then click "Open the console" for the rest.
 Show the live table in README's Experiment-2 section, then one distilled rule with
 its self-written rationale.
 
-### 1:50–2:20 — Live triage with provenance (console triage box, Northwind workspace)
-- Type: *"I was charged twice this month, please refund the duplicate charge."*
-> "It predicts **billing** — and it *shows its work*: the exact memories that justified
-> the call. Every decision is explainable."
+### 1:50–2:20 — Live triage with provenance (console triage box)
+- In the **Northwind** workspace, type:
+  *"Please refund my duplicate subscription charge."*
+> "Surface reading says billing. Mnemo routes it to **account** — because it *learned*
+> Northwind's policy: refunds go to account managers. And it shows its work: the
+> decision ledger cites the fired rule, which the Dreaming loop wrote itself."
+- (If time allows) switch the workspace to **Globex**, same ticket → **billing**:
+> "Same model, same ticket, different org — each workspace cites its own learned policy."
 - Mention decay + conflict resolution in one line:
 > "Rules that prove wrong lose confidence and fade; refined rules supersede stale ones."
 
