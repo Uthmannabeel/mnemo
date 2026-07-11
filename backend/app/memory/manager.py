@@ -90,10 +90,9 @@ class MemoryManager:
             for rec, sim in self.store.search(user_id, q_emb, tier, k):
                 out.append(ScoredMemory(record=rec, score=self._score(rec, sim), similarity=sim))
         out.sort(key=lambda sm: sm.score, reverse=True)
-        # Mark retrieved memories as used (strengthens them against decay).
-        for sm in out:
-            sm.record.touch()
-            self.store.update(sm.record)
+        # Mark retrieved memories as used (strengthens them against decay) —
+        # one batched store write, not a round-trip per record.
+        self.store.mark_used([sm.record.id for sm in out])
         return out
 
     # -------------------------------------------------- promotion / conflict

@@ -14,9 +14,27 @@ import threading
 from collections import OrderedDict
 from typing import Any
 
-from tenacity import retry, stop_after_attempt, wait_exponential
+from tenacity import retry, retry_if_exception, stop_after_attempt, wait_exponential
 
 from .config import get_settings
+
+
+def _transient(exc: BaseException) -> bool:
+    """Retry only transient failures. Auth and bad-request errors fail fast —
+    retrying a 401 three times just delays the real error message."""
+    try:
+        from openai import APIConnectionError, APITimeoutError, InternalServerError, RateLimitError
+    except ImportError:
+        return False
+    return isinstance(exc, (APIConnectionError, APITimeoutError, InternalServerError, RateLimitError))
+
+
+_RETRY = dict(
+    stop=stop_after_attempt(3),
+    wait=wait_exponential(min=1, max=8),
+    retry=retry_if_exception(_transient),
+    reraise=True,
+)
 
 
 class QwenClient:
@@ -49,7 +67,7 @@ class QwenClient:
         return self.force_offline or self.s.offline
 
     # ------------------------------------------------------------------ chat
-    @retry(stop=stop_after_attempt(3), wait=wait_exponential(min=1, max=8))
+    @retry(**_RETRY)
     def chat(
         self,
         messages: list[dict[str, Any]],
@@ -103,7 +121,7 @@ class QwenClient:
         return _extract_json(text or "{}")
 
     # ------------------------------------------------------------- embeddings
-    @retry(stop=stop_after_attempt(3), wait=wait_exponential(min=1, max=8))
+    @retry(**_RETRY)
     def embed(self, texts: list[str]) -> list[list[float]]:
         """Embed a batch of texts. Deterministic hashing fallback when offline."""
         if self._client is None:

@@ -115,19 +115,37 @@ class Consolidator:
         # Reconcile against existing rules that share a keyword (the discriminative
         # signal), NOT just the same category — otherwise every same-category rule
         # looks alike and we'd keep only one keyword per category, capping the ceiling.
+        # Walk ALL overlapping rules, not just the first match — otherwise a second
+        # stale rule on the same keyword survives a conflict.
         if tier is Tier.PROCEDURAL:
             new_kws = set(attrs.get("keywords", []))
             new_cat = attrs.get("category")
+            corroborated = False
+            retired: list[MemoryRecord] = []
             for existing in self.m.store.all(user_id, Tier.PROCEDURAL):
                 ex_kws = set(existing.attrs.get("keywords", []))
                 if not (new_kws and ex_kws and (new_kws & ex_kws)):
                     continue  # different keyword → an unrelated, distinct rule
                 if existing.attrs.get("category") == new_cat:
-                    self.m.reinforce(existing, +0.08)          # same keyword & verdict: corroborate
+                    self.m.reinforce(existing, +0.08)  # same keyword & verdict: corroborate
+                    corroborated = True
                 else:
-                    self.m.supersede(existing, content, attrs)  # same keyword, NEW verdict: conflict → replace
-                return
-            # No overlapping-keyword rule exists → keep this as a new distinct rule.
+                    existing.active = False            # same keyword, NEW verdict: retire
+                    self.m.store.update(existing)
+                    retired.append(existing)
+            if corroborated:
+                return  # existing rule(s) already carry this knowledge
+            if retired:
+                # The replacement inherits provenance and a small trust bump — same
+                # semantics as MemoryManager.supersede(), but one rule replaces all
+                # retired conflicts instead of one replacement per conflict.
+                item = {
+                    **item,
+                    "source_ids": item.get("source_ids", []) + [r.id for r in retired],
+                    "confidence": min(1.0, max(float(item.get("confidence", 0.6)),
+                                               max(r.confidence for r in retired) + 0.1)),
+                }
+            # else: no overlapping-keyword rule exists → keep this as a new distinct rule.
 
         self.m.promote(
             content=content,

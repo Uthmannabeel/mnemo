@@ -14,7 +14,7 @@ from __future__ import annotations
 import threading
 from pathlib import Path
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, field_validator
@@ -24,7 +24,7 @@ from .agent.triage import CATEGORIES, TriageAgent
 from .config import get_settings
 from .memory.consolidation import Consolidator
 from .memory.manager import MemoryManager
-from .memory.types import Decision
+from .memory.types import Decision, Tier
 
 # No CORS middleware on purpose: the dashboard is served same-origin by this app,
 # and the mutating endpoints have no auth — don't invite cross-origin callers.
@@ -161,6 +161,10 @@ class SeedIn(BaseModel):
     profile: str = "standard"
 
 
+_seed_lock = threading.Lock()
+_SEED_EPISODE_CAP = 500  # abuse brake: an unauthenticated caller can't bloat a workspace
+
+
 @app.post("/seed")
 def seed(body: SeedIn | None = None) -> dict:
     """Populate a workspace's LIVE memory with two sessions of demo experience.
@@ -170,8 +174,24 @@ def seed(body: SeedIn | None = None) -> dict:
     profiles and the same ticket routes differently in each, each citing its own
     learned rules. Distinct seeds from the benchmarks so this can't be mistaken
     for the experiments.
+
+    Serialized (one run at a time) and capped per workspace: this endpoint is
+    unauthenticated and, in live mode, each run spends real Qwen credits.
     """
     body = body or SeedIn()
+    if not _seed_lock.acquire(blocking=False):
+        raise HTTPException(429, "a seed run is already in progress; try again shortly")
+    try:
+        return _seed(body)
+    finally:
+        _seed_lock.release()
+
+
+def _seed(body: SeedIn) -> dict:
+    if len(_manager.store.all(body.user_id, Tier.EPISODIC)) >= _SEED_EPISODE_CAP:
+        raise HTTPException(
+            409, f"workspace '{body.user_id}' already holds {_SEED_EPISODE_CAP}+ episodes; not reseeding"
+        )
     if body.profile == "conventions":
         from .eval.org_dataset import make_org_sessions
 
