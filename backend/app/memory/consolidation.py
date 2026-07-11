@@ -19,11 +19,14 @@ confidence derived from the strength of the evidence.
 """
 from __future__ import annotations
 
+import logging
 import re
 from collections import Counter, defaultdict
 
 from .manager import MemoryManager
 from .types import MemoryRecord, Tier
+
+logger = logging.getLogger(__name__)
 
 _STOP = set(
     "the a an and or to of for in on is are was i you it my me we they them this that with "
@@ -48,10 +51,11 @@ class Consolidator:
         self.m = manager
         self.qwen = manager.qwen  # share the manager's client (may be force-offline)
 
-    def _recent_unconsolidated(self, user_id: str) -> list[MemoryRecord]:
+    def pending_episodes(self, user_id: str) -> list[MemoryRecord]:
         # The "already consolidated" flag lives in the store, not in process memory,
         # so a separate Function Compute cron shares state with the API over RDS and
-        # never re-processes the same episodes.
+        # never re-processes the same episodes. The API's auto-dream trigger counts
+        # these too, for the same reason.
         eps = self.m.store.all(user_id, Tier.EPISODIC)
         return [e for e in eps if not e.attrs.get("consolidated")]
 
@@ -64,7 +68,7 @@ class Consolidator:
         too-small window, and spurious correlations that look strong in one window
         wash out against the whole record.
         """
-        episodes = self._recent_unconsolidated(user_id)
+        episodes = self.pending_episodes(user_id)
         if not episodes:
             return {"episodes": 0, "semantic": 0, "procedural": 0}
         history = self.m.store.all(user_id, Tier.EPISODIC)
@@ -93,7 +97,20 @@ class Consolidator:
         content = (item.get("content") or "").strip()
         if not content:
             return
-        attrs = {k: item[k] for k in ("category", "keywords") if k in item}
+        attrs = {k: item[k] for k in ("category", "keywords", "kind") if k in item}
+
+        # Semantic tier must not pile up: with a Dreaming pass every few feedbacks,
+        # re-deriving the same fact each pass would drown the tier in duplicates.
+        # Identical content corroborates; a rolling summary (same "kind") supersedes.
+        if tier is Tier.SEMANTIC:
+            kind = attrs.get("kind")
+            for existing in self.m.store.all(user_id, Tier.SEMANTIC):
+                if existing.content == content:
+                    self.m.reinforce(existing, +0.05)
+                    return
+                if kind and existing.attrs.get("kind") == kind:
+                    self.m.supersede(existing, content, attrs)
+                    return
 
         # Reconcile against existing rules that share a keyword (the discriminative
         # signal), NOT just the same category — otherwise every same-category rule
@@ -134,7 +151,9 @@ class Consolidator:
         try:
             return self.qwen.complete_json(_REFLECT_SYSTEM, user)
         except Exception:
-            # Never let a bad LLM response stall the Dreaming loop.
+            # Never let a bad LLM response stall the Dreaming loop — but say so,
+            # or a broken key silently degrades every pass to the offline distiller.
+            logger.warning("online reflection failed; using offline distiller", exc_info=True)
             return self._reflect_offline(episodes)
 
     # ------------------------------------------------------------- offline
@@ -192,6 +211,7 @@ class Consolidator:
                 "content": f"Most incoming tickets in this window resolved to '{top_cat}' "
                            f"({top_n}/{sum(cat_counts.values())}).",
                 "category": top_cat,  # lets the decision layer use it as a weak prior
+                "kind": "window_summary",  # rolling: each pass supersedes the last one
                 "confidence": 0.7,
                 "importance": 0.5,
                 "source_ids": [e.id for e in episodes[:5]],

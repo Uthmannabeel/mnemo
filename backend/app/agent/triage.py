@@ -14,8 +14,12 @@ loop distils rules from feedback, later predictions get measurably better.
 """
 from __future__ import annotations
 
+import logging
+
 from ..memory.manager import MemoryManager
 from ..memory.types import Decision, ScoredMemory, Tier
+
+logger = logging.getLogger(__name__)
 
 CATEGORIES = ["billing", "technical", "account", "shipping", "feedback"]
 
@@ -92,6 +96,8 @@ class TriageAgent:
                 return cat, "fallback: model returned an unknown category"
             return cat, data.get("rationale", "")
         except Exception:
+            # Otherwise a broken key / endpoint looks exactly like offline mode.
+            logger.warning("online decision failed; falling back to offline vote", exc_info=True)
             return self._decide_offline(ticket, working)
 
     def _decide_offline(self, ticket: str, working: list[ScoredMemory]) -> tuple[str, str]:
@@ -140,9 +146,11 @@ class TriageAgent:
         )
         # 2. Credit-assign: reinforce/penalise ONLY the rules that actually fired for this
         # decision (not every retrieved memory), so an inert rule isn't rewarded/blamed.
+        # Ownership check is load-bearing: fired ids arrive from the client on /feedback,
+        # so one workspace must never be able to move another workspace's rules.
         for mid in decision.fired_memory_ids:
             rec = self.m.store.get(mid)
-            if rec and rec.tier is Tier.PROCEDURAL:
+            if rec and rec.user_id == user_id and rec.tier is Tier.PROCEDURAL:
                 self.m.reinforce(rec, +0.05 if correct else -0.12)
 
     # --------------------------------------------------------------- helpers

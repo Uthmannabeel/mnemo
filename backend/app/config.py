@@ -2,12 +2,17 @@
 from __future__ import annotations
 
 from functools import lru_cache
+from pathlib import Path
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+    # env_file anchored to backend/.env so behavior doesn't depend on the launch
+    # directory (a relative ".env" silently loads nothing from the repo root).
+    model_config = SettingsConfigDict(
+        env_file=Path(__file__).resolve().parents[1] / ".env", extra="ignore"
+    )
 
     # Qwen Cloud / DashScope
     dashscope_api_key: str = ""
@@ -17,7 +22,7 @@ class Settings(BaseSettings):
     qwen_embed_dim: int = 1024
 
     # Runtime
-    mnemo_offline: int = 0
+    mnemo_offline: bool = False
     mnemo_store: str = "memory"  # "memory" | "postgres"
     database_url: str = "postgresql://mnemo:mnemo@localhost:5432/mnemo"
 
@@ -28,7 +33,7 @@ class Settings(BaseSettings):
     @property
     def offline(self) -> bool:
         # Offline if explicitly requested, or if no key is configured.
-        return bool(self.mnemo_offline) or not self.dashscope_api_key
+        return self.mnemo_offline or not self.dashscope_api_key
 
 
 @lru_cache

@@ -10,6 +10,7 @@ from __future__ import annotations
 import hashlib
 import json
 import math
+import threading
 from collections import OrderedDict
 from typing import Any
 
@@ -23,6 +24,7 @@ class QwenClient:
         self.s = get_settings()
         self.force_offline = force_offline  # e.g. the benchmark: deterministic + free by design
         self._embed_cache: "OrderedDict[str, list[float]]" = OrderedDict()
+        self._embed_lock = threading.Lock()  # FastAPI serves sync endpoints from a threadpool
         self._client = None
         if not self.offline:
             # Trust the OS certificate store when available: on Windows dev machines,
@@ -111,7 +113,14 @@ class QwenClient:
             resp = self._client.embeddings.create(
                 model=self.s.qwen_embed_model, input=texts, dimensions=self.s.qwen_embed_dim
             )
-        except Exception:
+        except Exception as exc:
+            # Only "model doesn't accept `dimensions`" falls back to the un-pinned call.
+            # Transient failures (timeouts, 429s) must propagate to the retry decorator,
+            # not be masked by switching request shape.
+            from openai import BadRequestError
+
+            if not isinstance(exc, BadRequestError):
+                raise
             resp = self._client.embeddings.create(model=self.s.qwen_embed_model, input=texts)
         # Sort by index so results align with `texts` regardless of server ordering.
         vecs = [d.embedding for d in sorted(resp.data, key=lambda d: d.index)]
@@ -125,14 +134,17 @@ class QwenClient:
     def embed_one(self, text: str) -> list[float]:
         # Small LRU: repeated queries (retrieval is called per decision) skip the
         # network round-trip — free offline, saves credits + latency online.
-        hit = self._embed_cache.get(text)
-        if hit is not None:
-            self._embed_cache.move_to_end(text)
-            return hit
+        # Lock covers cache mutation only, never the network call.
+        with self._embed_lock:
+            hit = self._embed_cache.get(text)
+            if hit is not None:
+                self._embed_cache.move_to_end(text)
+                return hit
         vec = self.embed([text])[0]
-        self._embed_cache[text] = vec
-        if len(self._embed_cache) > 4096:
-            self._embed_cache.popitem(last=False)
+        with self._embed_lock:
+            self._embed_cache[text] = vec
+            if len(self._embed_cache) > 4096:
+                self._embed_cache.popitem(last=False)
         return vec
 
 

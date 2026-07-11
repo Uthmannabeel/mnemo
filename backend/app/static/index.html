@@ -295,7 +295,7 @@ function recRow(m, monoTxt){
   const cat = m.attrs && m.attrs.category ? m.attrs.category : '';
   return `<div class="rec">
     <div class="txt${monoTxt?' mono':''}">${esc(m.content)}</div>
-    <div class="meta">${cat ? cat+'<br>' : ''}<span class="meter"><i style="width:${conf}%"></i></span> ${(m.confidence).toFixed(2)} · ×${m.use_count}</div>
+    <div class="meta">${cat ? esc(cat)+'<br>' : ''}<span class="meter"><i style="width:${conf}%"></i></span> ${(m.confidence).toFixed(2)} · ×${m.use_count}</div>
   </div>`;
 }
 function esc(s){ const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
@@ -314,7 +314,7 @@ async function refreshMemory(){
     fill('listPro','cPro',pro,'No rules yet.',true);
     fill('listSem','cSem',sem,'No facts yet.',false,3);
     fill('listEpi','cEpi',epi.slice(-40),'No episodes yet. Seed a sample workload, or teach from a triage.',false,3);
-  }catch(e){}
+  }catch(e){ console.warn('memory refresh failed', e); }
 }
 
 /* ---------- triage + ledger ---------- */

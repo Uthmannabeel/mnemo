@@ -158,7 +158,8 @@ class PostgresStore:
         q = "SELECT * FROM memories WHERE user_id=%s"
         params: list = [user_id]
         if tier is not None:
-            q += " AND tier=%s"; params.append(tier.value)
+            q += " AND tier=%s"
+            params.append(tier.value)
         if active_only:
             q += " AND active=TRUE"
         # Chronological order matters: consolidation slices "the recent window" and
@@ -176,7 +177,8 @@ class PostgresStore:
         q = "SELECT *, 1 - (embedding <=> %s) AS sim FROM memories WHERE user_id=%s AND embedding IS NOT NULL"
         params: list = [vec, user_id]
         if tier is not None:
-            q += " AND tier=%s"; params.append(tier.value)
+            q += " AND tier=%s"
+            params.append(tier.value)
         if active_only:
             q += " AND active=TRUE"
         q += " ORDER BY embedding <=> %s LIMIT %s"

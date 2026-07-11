@@ -11,29 +11,29 @@ Endpoints:
 """
 from __future__ import annotations
 
+import threading
 from pathlib import Path
 
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 
 from . import __version__
-from .agent.triage import TriageAgent
+from .agent.triage import CATEGORIES, TriageAgent
 from .config import get_settings
 from .memory.consolidation import Consolidator
 from .memory.manager import MemoryManager
+from .memory.types import Decision
 
+# No CORS middleware on purpose: the dashboard is served same-origin by this app,
+# and the mutating endpoints have no auth — don't invite cross-origin callers.
 app = FastAPI(title="Mnemo", version=__version__)
-app.add_middleware(
-    CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"]
-)
 
 _manager = MemoryManager()
 _agent = TriageAgent(_manager, mode="full")
 _consolidator = Consolidator(_manager)
-_feedback_since_dream = 0  # auto-triggers a Dreaming pass every `consolidation_every`
+_dream_lock = threading.Lock()  # one auto-Dreaming pass at a time
 
 
 class TriageIn(BaseModel):
@@ -48,6 +48,15 @@ class FeedbackIn(BaseModel):
     used_memory_ids: list[str] = []
     fired_memory_ids: list[str] = []  # rules that drove the call — from /triage's response
     user_id: str = "default"
+
+    # Categories end up in stored attrs and rendered in the dashboard — reject
+    # anything outside the known taxonomy at the boundary.
+    @field_validator("predicted_category", "true_category")
+    @classmethod
+    def _known_category(cls, v: str) -> str:
+        if v not in CATEGORIES:
+            raise ValueError(f"unknown category {v!r}; expected one of {CATEGORIES}")
+        return v
 
 
 _STATIC = Path(__file__).parent / "static"
@@ -110,8 +119,6 @@ def triage(body: TriageIn) -> dict:
 
 @app.post("/feedback")
 def feedback(body: FeedbackIn) -> dict:
-    from .memory.types import Decision
-
     d = Decision(
         query=body.ticket,
         prediction={"category": body.predicted_category},
@@ -122,14 +129,17 @@ def feedback(body: FeedbackIn) -> dict:
     _agent.learn(d, body.true_category, user_id=body.user_id)
 
     # Autonomy: once enough new experience has accumulated, dream on it automatically.
-    # (The scheduled Function Compute cron is the production path; this makes a
-    # standalone API self-improving too.)
-    global _feedback_since_dream
-    _feedback_since_dream += 1
+    # The trigger is derived from the store (unconsolidated episodes for THIS
+    # workspace), not a process-local counter — so it stays correct per user, across
+    # request threads, and across processes, same as the Function Compute cron.
     dreamed = None
-    if _feedback_since_dream >= get_settings().consolidation_every:
-        _feedback_since_dream = 0
-        dreamed = _consolidator.run(user_id=body.user_id)
+    if _dream_lock.acquire(blocking=False):
+        try:
+            pending = len(_consolidator.pending_episodes(body.user_id))
+            if pending >= get_settings().consolidation_every:
+                dreamed = _consolidator.run(user_id=body.user_id)
+        finally:
+            _dream_lock.release()
     return {"ok": True, "dreamed": dreamed}
 
 
@@ -186,6 +196,22 @@ def seed(body: SeedIn | None = None) -> dict:
 
 
 _eval_cache: dict[tuple[int, int, int], dict] = {}
+_eval2_cache: dict[tuple[int, int, int], dict] = {}
+_EVAL_CACHE_MAX = 16  # distinct param tuples worth keeping; beyond this, evict oldest
+
+
+def _clamped(sessions: int, per_session: int, max_s: int, max_p: int) -> tuple[int, int]:
+    # These are public, unauthenticated endpoints running CPU-bound work — clamp the
+    # experiment size so a caller can't request an arbitrarily expensive run.
+    return max(1, min(sessions, max_s)), max(1, min(per_session, max_p))
+
+
+def _cached(cache: dict, key: tuple, compute) -> dict:
+    if key not in cache:
+        if len(cache) >= _EVAL_CACHE_MAX:
+            cache.pop(next(iter(cache)))
+        cache[key] = compute()
+    return cache[key]
 
 
 @app.post("/eval")
@@ -195,13 +221,9 @@ def eval_run(sessions: int = 8, per_session: int = 25, seed: int = 7) -> dict:
     page load without recomputing or ever touching the Qwen API."""
     from .eval.harness import run
 
+    sessions, per_session = _clamped(sessions, per_session, 12, 50)
     key = (sessions, per_session, seed)
-    if key not in _eval_cache:
-        _eval_cache[key] = run(sessions, per_session, seed)
-    return _eval_cache[key]
-
-
-_eval2_cache: dict[tuple[int, int, int], dict] = {}
+    return _cached(_eval_cache, key, lambda: run(sessions, per_session, seed))
 
 
 @app.post("/eval2")
@@ -211,7 +233,8 @@ def eval2_run(sessions: int = 5, per_session: int = 15, seed: int = 11) -> dict:
     the CLI's job (`python -m app.eval.live_harness --yes`)."""
     from .eval.live_harness import run_experiment
 
+    sessions, per_session = _clamped(sessions, per_session, 10, 30)
     key = (sessions, per_session, seed)
-    if key not in _eval2_cache:
-        _eval2_cache[key] = run_experiment(sessions, per_session, seed, force_offline=True)
-    return _eval2_cache[key]
+    return _cached(
+        _eval2_cache, key, lambda: run_experiment(sessions, per_session, seed, force_offline=True)
+    )
