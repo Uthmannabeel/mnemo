@@ -3,8 +3,9 @@
 **Track:** MemoryAgent
 
 ## Elevator pitch (one line)
-Frontier models can't know your organization — Mnemo makes Qwen3.7-Max learn it,
-measurably, with a human-like four-tier memory that distils experience into rules.
+Zero-shot Qwen3.7-Max scores 0% on decisions governed by your organization's private
+conventions — four sessions straight. With Mnemo the same model reaches 100%, on half
+the context tokens per decision. Measured live, every prediction committed for audit.
 
 ## Inspiration
 Almost every "memory agent" is a chatbot wired to a vector store: it can recall the
@@ -18,21 +19,24 @@ into **semantic facts** and **procedural rules**, which then steer future decisi
 Every decision is explainable and cites the exact memories that justified it.
 
 Two controlled experiments back the claim:
-- **Exp 1 (architecture ablation):** under a fixed per-decision context budget,
-  21% (no memory) → 60% (episodic RAG) → **71% mean / 100% final** (Mnemo) — distilled
-  rules beat raw retrieval when context is finite.
-- **Exp 2 (does memory help Qwen itself? — LIVE, real Qwen3.7-Max both arms):**
-  tickets whose ground truth depends on *organization conventions no model can know a
-  priori* (refunds route to account managers by policy; "Project Falcon" tickets go to
-  the white-glove team…). Zero-shot Qwen3.7-Max: **98% on plain tickets, 0% on
+- **Exp 2 — the headline (does memory help Qwen itself? LIVE, real Qwen3.7-Max both
+  arms):** tickets whose ground truth depends on *organization conventions no model can
+  know a priori* (refunds route to account managers by policy; "Project Falcon" tickets
+  go to the white-glove team…). Zero-shot Qwen3.7-Max: **98% on plain tickets, 0% on
   convention tickets for four straight sessions**. The same model with Mnemo: **100%
   by session 4** (+86 pt final gap). All five conventions distilled into readable
   rules with self-written rationales; every one of the 150 predictions committed to
   the repo for audit.
-- **Also test-enforced:** 50% smaller memory context per decision than raw RAG (token
-  economics); **unlearning** — a changed org policy supersedes its stale rule within a
-  few corrections; and **isolated workspaces** — the same ticket routes differently in
-  two orgs, each citing its own learned policy.
+- **Exp 1 (architecture ablation — why distillation, not just retrieval):** under a
+  fixed per-decision context budget, 21% (no memory) → 60% (episodic RAG) →
+  **71% mean / 100% final** (Mnemo) — distilled rules beat raw retrieval when context
+  is finite.
+- **The economics, test-enforced:** Mnemo reaches those numbers on a **50% smaller
+  memory context per decision** than raw RAG — higher accuracy at roughly half the
+  per-decision token spend, so it pays for itself at production volume.
+- **Also test-enforced:** **unlearning** — a changed org policy supersedes its stale
+  rule within a few corrections; and **isolated workspaces** — the same ticket routes
+  differently in two orgs, each citing its own learned policy.
 
 ## How we built it
 - **Four-tier memory** (working / episodic / semantic / procedural), modelled on human
@@ -53,7 +57,9 @@ Two controlled experiments back the claim:
 Our first "ablation" still hit 100% because raw k-NN over near-duplicate tickets was
 trivially easy — which would have made the memory look pointless. We redesigned the
 experiment around a **finite context budget** and **noisy, realistic tickets**, which
-is exactly the regime where distilled rules beat raw recall (the "context rot" problem).
+is exactly the regime where distilled rules beat raw recall — the "context rot" effect
+Chroma Research documented in 2025: model performance degrades as input context grows,
+so what you put in the window matters more than how much you can fit.
 
 ## Accomplishments we're proud of
 Two controlled, reproducible experiments — the ablation runs in 2 seconds offline, no

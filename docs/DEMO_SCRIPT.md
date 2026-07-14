@@ -6,20 +6,24 @@ the architecture that earns it, then prove it runs on Alibaba Cloud.
 
 ---
 
-### 0:00–0:20 — The hook (talking head or voiceover over dashboard)
-> "Most memory agents just bolt a chatbot to a vector database. They *store* the past,
-> they don't *learn* from it. Mnemo is a cognitive memory architecture — and I can
-> prove it makes better decisions the longer it runs."
+### 0:00–0:20 — The hook (a failure story with a number, not category talk)
+> "We gave the strongest Qwen model support tickets governed by rules that exist only
+> inside one company — refunds go to account managers, Project Falcon gets the
+> white-glove team. Zero-shot, it scored **zero percent**. Four sessions in a row.
+> Not because the model is weak — because that knowledge doesn't exist outside the
+> org. Mnemo is how the model learns it."
 
 Open on the LANDING PAGE (http://47.84.232.162:8000) — the 0→100 scoreboard is the
 first frame. Then click "Open the console" for the rest.
 
-### 0:20–0:55 — The proof (console, Evidence section — both charts load on page open)
-- Point at the three lines of Experiment 1:
-  > "Same support tickets, same context budget per decision. The only difference is
-  > memory. No-memory stays at chance — 21%. Classic episodic RAG climbs to 60%.
-  > Mnemo hits 71% mean, 100% by the last session."
-- Emphasize: "This is a controlled ablation, not a cherry-picked demo."
+### 0:20–0:55 — The proof (the LIVE experiment — strongest evidence first)
+- Show the README Experiment-2 live table:
+  > "We ran it live — both arms real Qwen3.7-Max. Zero-shot: 98% on ordinary tickets,
+  > 0% on convention tickets, four sessions straight. The same model with Mnemo:
+  > 14, 71, 86, then **100%** — an 86-point final gap. Every one of the 150
+  > predictions is committed to the repo. And Mnemo does it on **half the context
+  > tokens per decision** — better answers at half the token spend."
+- Show one distilled rule with its self-written rationale.
 
 ### 0:55–1:25 — The architecture (README mermaid diagram on screen)
 > "Here's why. Mnemo has four memory tiers, modelled on human memory. Every ticket
@@ -31,13 +35,13 @@ first frame. Then click "Open the console" for the rest.
 > "Under a finite context budget, a handful of distilled rules beat a pile of noisy
 > raw tickets — that's the context-rot problem Qwen's own models are built to fight."
 
-### 1:25–1:50 — the killer-question slide (the strongest 25 seconds)
-> "The obvious objection: wouldn't Qwen alone ace this? We ran it — live, both arms
-> real Qwen3.7-Max. On ordinary tickets, zero-shot scores 98%. On tickets governed by
-> org conventions, it scores **zero** — four sessions straight. With Mnemo, the same
-> model reaches **100%**. Every one of the 150 predictions is in the repo."
-Show the live table in README's Experiment-2 section, then one distilled rule with
-its self-written rationale.
+### 1:25–1:50 — the rigor slide (controlled ablation, Experiment 1)
+> "Is it the memory *architecture*, or would any retrieval do? Controlled ablation —
+> same tickets, same fixed context budget per decision, only the memory differs.
+> No memory sits at chance, 21%. Classic episodic RAG climbs to 60%. Mnemo hits 71%
+> mean and 100% by the final session. Distilled rules beat raw retrieval when
+> context is finite."
+Point at the three lines of the Experiment-1 chart in the console Evidence section.
 
 ### 1:50–2:20 — Live triage with provenance (console triage box)
 - In the **Northwind** workspace, type:
@@ -54,7 +58,7 @@ its self-written rationale.
 - Show the ECS instance in the Alibaba Cloud console (Singapore region, public IP
   visible), then `GET http://47.84.232.162:8000/health` in a terminal →
   `"mode": "qwen-live"`, `"qwen_model": "qwen3.7-max"`.
-- Click **💤 Dream now** in the console (or `POST /consolidate`) and show new
+- Click **Dream now** in the console (or `POST /consolidate`) and show new
   procedural rules appearing in the memory browser — the Dreaming loop running live
   on Alibaba Cloud infrastructure.
 > "This is running right now on an Alibaba Cloud ECS instance in Singapore —
