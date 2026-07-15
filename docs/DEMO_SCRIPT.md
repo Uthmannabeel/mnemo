@@ -1,8 +1,12 @@
 # 3-minute demo video script
 
-Target: ~3:00. Screen-record the dashboard + a terminal + the Alibaba Cloud console.
-Judging leans on Technical Depth + Innovation, so **lead with the result**, then show
-the architecture that earns it, then prove it runs on Alibaba Cloud.
+Target: **hard cap 3:00** — the official rules state judges "are not required to
+watch beyond three minutes", and may judge from the video + text alone without ever
+touching the live demo. Everything that scores must be on screen inside 3:00, and
+the 0%→100% number must land in the first ten seconds. Screen-record the dashboard +
+a terminal + the Alibaba Cloud console. Judging leans on Technical Depth +
+Innovation, so **lead with the result**, then show the architecture that earns it,
+then prove it runs on Alibaba Cloud.
 
 ---
 

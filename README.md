@@ -18,6 +18,39 @@ controlled three-arm experiment.
 
 ---
 
+## For judges — the 60-second tour
+
+1. Open the live console: **http://47.84.232.162:8000/console** (Alibaba Cloud ECS,
+   Singapore — `/health` shows `qwen-live`).
+2. In the **Northwind** workspace, paste this ticket and hit Triage:
+   *"Please refund my duplicate subscription charge."*
+   Surface reading says *billing*. Mnemo answers **account** — because it learned
+   Northwind's private policy (refunds route to account managers) from feedback, and
+   the decision ledger cites the exact rule it wrote for itself.
+3. Switch the workspace to **Globex** (an org without that policy): the same ticket
+   routes to **billing**. Same model, different learned memory.
+4. The two charts below the triage box are both experiments, computed from server
+   state — including the live run where zero-shot Qwen3.7-Max scored **0%** on
+   org-convention tickets and the same model with Mnemo reached **100%**.
+
+Prefer not to trust a live demo? The whole result reproduces offline in ~2 seconds
+with no API key (below), and every live prediction is committed to the repo.
+
+---
+
+## Track fit — what the MemoryAgent track asks for, point by point
+
+| Track requirement (verbatim) | Mnemo mechanism | Proof |
+|---|---|---|
+| *"efficient memory storage and retrieval"* | four tiers (episodic/semantic/procedural) with blended scoring: similarity + recency-decay + importance + confidence | **50% smaller context per decision** than raw RAG at higher accuracy — test-locked |
+| *"timely forgetting of outdated information"* | confidence decay on wrong rules, recency-weighted consolidation (mistakes ×2), supersede-on-conflict | [`tests/test_adaptation.py`](backend/tests/test_adaptation.py): a changed refund policy **flips its own rule** within a few corrections |
+| *"recalling critical memories within limited context windows"* | hard per-decision retrieval budget (6 memories), spent across tiers | Exp 1: **+10.5 pts over episodic RAG under the identical budget** |
+| *"increasingly accurate decisions across multi-turn, cross-session interactions"* | the Dreaming loop consolidates between sessions | Live Exp 2: **14 → 71 → 86 → 100%** across sessions, real Qwen3.7-Max |
+
+Every row is enforced by a CI regression test — the build fails if learning ever stops.
+
+---
+
 ## The result (this is the whole point)
 
 Support-ticket triage, 8 sessions × 25 tickets, identical tickets and identical

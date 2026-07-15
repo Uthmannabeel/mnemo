@@ -61,6 +61,29 @@ def test_dashboard_loop():
         assert c.get(path).status_code == 200, path
 
 
+def test_autoseed():
+    """MNEMO_AUTOSEED repopulates empty demo workspaces on startup and is idempotent —
+    the live console must survive a container restart with no manual re-seeding."""
+    import app.api as api
+    from app.memory.types import Tier
+
+    os.environ["MNEMO_AUTOSEED"] = "auto_nw:conventions,auto_gx:standard"
+    try:
+        api._autoseed()
+        assert api._manager.store.all("auto_nw", Tier.EPISODIC), "conventions workspace seeded"
+        n = len(api._manager.store.all("auto_gx", Tier.EPISODIC))
+        assert n > 0, "standard workspace seeded"
+        api._autoseed()  # second run must not double-seed
+        assert len(api._manager.store.all("auto_gx", Tier.EPISODIC)) == n
+        # the conventions workspace actually learned its org policy
+        c = TestClient(api.app)
+        r = c.post("/triage", json={"ticket": TICKET, "user_id": "auto_nw"}).json()
+        assert r["category"] == "account", r
+    finally:
+        del os.environ["MNEMO_AUTOSEED"]
+
+
 if __name__ == "__main__":
     test_dashboard_loop()
+    test_autoseed()
     print("ok")

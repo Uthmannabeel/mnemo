@@ -22,6 +22,10 @@ QWEN_MODEL=qwen3.7-max
 MNEMO_OFFLINE=0
 MNEMO_STORE=memory                 # or postgres + DATABASE_URL for Option B
 # DATABASE_URL=postgresql://user:pass@<rds-host>:5432/mnemo
+# Self-healing demo (recommended for the judging window with MNEMO_STORE=memory):
+# on startup, re-seed any empty demo workspace and pre-warm the evidence charts,
+# so a container restart never leaves judges a blank console.
+MNEMO_AUTOSEED=northwind:conventions,globex:standard
 ```
 
 ---

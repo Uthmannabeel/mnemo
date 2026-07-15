@@ -11,7 +11,10 @@ Endpoints:
 """
 from __future__ import annotations
 
+import logging
+import os
 import threading
+from contextlib import asynccontextmanager
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException
@@ -26,9 +29,20 @@ from .memory.consolidation import Consolidator
 from .memory.manager import MemoryManager
 from .memory.types import Decision, Tier
 
+logger = logging.getLogger(__name__)
+
+
+@asynccontextmanager
+async def _lifespan(_app: FastAPI):
+    # Background thread: seeding may make real Qwen calls in live mode; never block
+    # startup or /health on it.
+    threading.Thread(target=_autoseed, daemon=True).start()
+    yield
+
+
 # No CORS middleware on purpose: the dashboard is served same-origin by this app,
 # and the mutating endpoints have no auth — don't invite cross-origin callers.
-app = FastAPI(title="Mnemo", version=__version__)
+app = FastAPI(title="Mnemo", version=__version__, lifespan=_lifespan)
 
 _manager = MemoryManager()
 _agent = TriageAgent(_manager, mode="full")
@@ -185,6 +199,36 @@ def seed(body: SeedIn | None = None) -> dict:
         return _seed(body)
     finally:
         _seed_lock.release()
+
+
+def _autoseed() -> None:
+    """Self-healing demo: if the process starts with empty demo workspaces (e.g. the
+    container restarted and MNEMO_STORE=memory wiped them), re-seed them and warm the
+    evidence caches — a judge landing on the console mid-judging must never find it
+    blank. Opt-in via MNEMO_AUTOSEED, e.g. "northwind:conventions,globex:standard".
+    """
+    spec = os.environ.get("MNEMO_AUTOSEED", "").strip()
+    if not spec:
+        return
+    for part in spec.split(","):
+        user_id, _, profile = part.strip().partition(":")
+        if not user_id:
+            continue
+        if _manager.store.all(user_id, Tier.EPISODIC):
+            continue  # workspace already has experience — never seed over it
+        try:
+            with _seed_lock:
+                summary = _seed(SeedIn(user_id=user_id, profile=profile or "standard"))
+            logger.info("autoseeded workspace %s: %s", user_id, summary)
+        except Exception:
+            logger.warning("autoseed failed for workspace %s", user_id, exc_info=True)
+    try:
+        # Both experiments are offline-forced + cached; warming them here means the
+        # first visitor's charts render instantly.
+        eval_run()
+        eval2_run()
+    except Exception:
+        logger.warning("evidence cache warm-up failed", exc_info=True)
 
 
 def _seed(body: SeedIn) -> dict:

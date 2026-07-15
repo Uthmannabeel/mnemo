@@ -7,6 +7,14 @@ Zero-shot Qwen3.7-Max scores 0% on decisions governed by your organization's pri
 conventions — four sessions straight. With Mnemo the same model reaches 100%, on half
 the context tokens per decision. Measured live, every prediction committed for audit.
 
+## Try it in 60 seconds (live on Alibaba Cloud)
+1. Open http://47.84.232.162:8000/console (ECS Singapore, `/health` = `qwen-live`).
+2. Workspace **Northwind** → paste *"Please refund my duplicate subscription charge."*
+   → Triage. Surface reading says billing; Mnemo answers **account**, and the decision
+   ledger cites the routing rule it wrote for itself from Northwind's feedback.
+3. Switch to **Globex** (no such policy): the same ticket routes to **billing**.
+   Same model — different learned memory, each decision fully auditable.
+
 ## Inspiration
 Almost every "memory agent" is a chatbot wired to a vector store: it can recall the
 past but never *learns* from it. We wanted an agent whose competence visibly compounds
@@ -16,7 +24,25 @@ with experience — and, crucially, a way to **measure** that instead of just cl
 Mnemo triages support tickets. Each ticket + outcome becomes a raw **episode**. An
 autonomous **Dreaming loop** (Qwen3.7-Max) reflects on recent episodes and distils them
 into **semantic facts** and **procedural rules**, which then steer future decisions.
-Every decision is explainable and cites the exact memories that justified it.
+Every decision is transparent and auditable: it cites the exact memory ids that
+justified it, so a support lead can see *why* a ticket routed where it did — and
+correct the rule, not just the ticket.
+
+## Track fit — the MemoryAgent brief, point by point
+The track asks for three specific capabilities; each is implemented **and enforced by
+a CI regression test** that fails the build if it stops working:
+- *"Efficient memory storage and retrieval"* → four tiers with blended scoring
+  (similarity + recency-decay + importance + confidence). Result: **50% smaller
+  context per decision** than raw RAG, at higher accuracy.
+- *"Timely forgetting of outdated information"* → confidence decay, recency-weighted
+  consolidation (mistakes count double), supersede-on-conflict. Proof:
+  `tests/test_adaptation.py` — a changed refund policy flips its own rule.
+- *"Recalling critical memories within limited context windows"* → a hard
+  per-decision retrieval budget of 6 memories, spent across tiers. Proof: **+10.5 pts
+  over episodic RAG under the identical budget** (Experiment 1).
+- *"Increasingly accurate decisions across multi-turn, cross-session interactions"*
+  → the Dreaming loop consolidates between sessions. Proof: **14 → 71 → 86 → 100%**
+  across sessions, live, real Qwen3.7-Max (Experiment 2).
 
 Two controlled experiments back the claim:
 - **Exp 2 — the headline (does memory help Qwen itself? LIVE, real Qwen3.7-Max both
