@@ -59,10 +59,8 @@ from the 3-min demo video), so it only needs to prove deployment — don't re-pi
   (Jul 28 – Aug 11, 2026)** and can judge from the video/text alone — but if they do
   visit, the console must work. Keep the ECS instance running until at least
   **Aug 11** (winners announced ~Aug 17; ~$0.04/hr ≈ $30/month), then release it.
-- Redeploy once with `MNEMO_AUTOSEED=northwind:conventions,globex:standard` in the
-  container env: the store is in-memory, so without it a container restart during
-  judging would present judges an empty console. With it, restarts self-heal and
-  the evidence charts pre-warm.
+- The `MNEMO_AUTOSEED` redeploy happens **before** the recordings, not here — the
+  deployed image predates the current site. See [ENDGAME.md](ENDGAME.md) step 0.
 - **Reset the DASHSCOPE API key** in Model Studio (it appeared in terminal
   scrollback during setup) — but only *after* judging ends, or coordinate the reset
   with updating the VM's `.env` and restarting the container in the same sitting,
