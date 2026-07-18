@@ -3,85 +3,130 @@
 Target: **hard cap 3:00** — the official rules state judges "are not required to
 watch beyond three minutes", and may judge from the video + text alone without ever
 touching the live demo. Everything that scores must be on screen inside 3:00, and
-the 0%→100% number must land in the first ten seconds. Screen-record the dashboard +
-a terminal + the Alibaba Cloud console. Judging leans on Technical Depth +
-Innovation, so **lead with the result**, then show the architecture that earns it,
-then prove it runs on Alibaba Cloud.
+the 0→100 arc must land — spoken and visible — inside the first twenty seconds.
+Judging leans on Technical Depth + Innovation, so **lead with the result**, then the
+architecture that earns it, then prove it runs on Alibaba Cloud. Every claim gets a
+cursor pointing at it: never say a number the screen isn't showing.
+
+Stay inside the product the whole time (landing → /evidence → /how → console) — no
+cuts to GitHub; the site already carries every table and diagram.
 
 ---
 
-### 0:00–0:20 — The hook (a failure story with a number, not category talk)
-> "We gave the strongest Qwen model support tickets governed by rules that exist only
-> inside one company — refunds go to account managers, Project Falcon gets the
-> white-glove team. Zero-shot, it scored **zero percent**. Four sessions in a row.
-> Not because the model is weak — because that knowledge doesn't exist outside the
-> org. Mnemo is how the model learns it."
+### 0:00–0:19 — The hook (landing page scoreboard, pre-loaded)
+> "These support tickets are governed by rules that exist only inside one company —
+> refunds go to account managers, Project Falcon gets the white-glove team.
+> Zero-shot, Qwen3.7-Max scores **zero percent**. Four sessions straight. The same
+> model, with Mnemo's memory: **one hundred**. This scoreboard is live."
 
-Open on the LANDING PAGE (http://47.84.232.162:8000) — the 0→100 scoreboard is the
-first frame. Then click "Open the console" for the rest.
+Screen: start **already on the landing page** (http://47.84.232.162:8000), browser
+zoom set so the h1 AND the scoreboard table are both in frame (the table sits below
+the hero — check before recording). Cursor rests on the zero row; drag it along
+`0 0 0 0` on "four sessions straight," then along `14 71 86 100` on "one hundred."
+Say "Qwen3.7-Max" by name — sponsor judges should hear their model in the first ten
+seconds.
 
-### 0:20–0:55 — The proof (the LIVE experiment — strongest evidence first)
-- Show the README Experiment-2 live table:
-  > "We ran it live — both arms real Qwen3.7-Max. Zero-shot: 98% on ordinary tickets,
-  > 0% on convention tickets, four sessions straight. The same model with Mnemo:
-  > 14, 71, 86, then **100%** — an 86-point final gap. Every one of the 150
-  > predictions is committed to the repo. And Mnemo does it on **half the context
-  > tokens per decision** — better answers at half the token spend."
-- Show one distilled rule with its self-written rationale.
+### 0:19–0:50 — The proof (stay on the scoreboard, then /evidence)
+> "Both arms are the real model, run live — every one of the 150 predictions is
+> committed to the repo for audit. Zero-shot never learns: by session five it's
+> still guessing at 14. With Mnemo: 14, 71, 86, then a hundred — and it stays there.
+> Plain tickets don't pay for it either — **95% retained**. And it does this on
+> **half the context per decision** — 574 characters where RAG needs eleven hundred.
+> Here's a rule it wrote for itself."
 
-### 0:55–1:25 — The architecture (README mermaid diagram on screen)
-> "Here's why. Mnemo has four memory tiers, modelled on human memory. Every ticket
-> and outcome is written as a raw *episode*. Then a background **Dreaming loop**,
-> powered by **Qwen3.7-Max**, reflects on those episodes and distils them into
-> **semantic facts** and **procedural rules** — 'if a ticket mentions *charged twice*,
-> it's billing.'"
-- Cut to the dashboard's memory tiers: show procedural rules that were auto-distilled.
-> "Under a finite context budget, a handful of distilled rules beat a pile of noisy
-> raw tickets — that's the context-rot problem Qwen's own models are built to fight."
+Screen: cursor on the scoreboard rows for the numbers; point at the **50% card /
+head-to-head figures** exactly when the half-context line is spoken; then click
+**Evidence** and scroll to one distilled rule with its self-written rationale —
+ideally the exception rule (`'purchase order'` overriding ordinary shipment
+language): it is the best answer to "a keyword table could do this."
 
-### 1:25–1:50 — the rigor slide (controlled ablation, Experiment 1)
-> "Is it the memory *architecture*, or would any retrieval do? Controlled ablation —
-> same tickets, same fixed context budget per decision, only the memory differs.
-> No memory sits at chance, 21%. Classic episodic RAG climbs to 60%. Mnemo hits 71%
-> mean and 100% by the final session. Distilled rules beat raw retrieval when
-> context is finite."
-Point at the three lines of the Experiment-1 chart in the console Evidence section.
+### 0:50–1:12 — The architecture (/how page, architecture.svg)
+> "Four memory tiers, modelled on human memory. Every ticket becomes a raw
+> *episode*. A background **Dreaming loop** — Qwen3.7-Max itself — reflects and
+> distils them into **semantic facts** and **procedural rules**. Under a finite
+> context budget, a handful of distilled rules beats a pile of noisy tickets."
 
-### 1:50–2:20 — Live triage with provenance (console triage box)
-- In the **Northwind** workspace, type:
-  *"Please refund my duplicate subscription charge."*
-> "Surface reading says billing. Mnemo routes it to **account** — because it *learned*
-> Northwind's policy: refunds go to account managers. And it shows its work: the
-> decision ledger cites the fired rule, which the Dreaming loop wrote itself."
-- (If time allows) switch the workspace to **Globex**, same ticket → **billing**:
-> "Same model, same ticket, different org — each workspace cites its own learned policy."
-- Mention decay + conflict resolution in one line:
-> "Rules that prove wrong lose confidence and fade; refined rules supersede stale ones."
+Screen: the /how page (serves architecture.svg locally — no GitHub detour).
 
-### 2:20–2:50 — Running on Alibaba Cloud (Alibaba console + terminal + browser)
-- Show the ECS instance in the Alibaba Cloud console (Singapore region, public IP
-  visible), then `GET http://47.84.232.162:8000/health` in a terminal →
-  `"mode": "qwen-live"`, `"qwen_model": "qwen3.7-max"`.
-- Click **Dream now** in the console (or `POST /consolidate`) and show new
-  procedural rules appearing in the memory browser — the Dreaming loop running live
-  on Alibaba Cloud infrastructure.
-> "This is running right now on an Alibaba Cloud ECS instance in Singapore —
-> Qwen3.7-Max and Qwen embeddings via Model Studio. Trigger a Dreaming pass and
-> watch it distil the session's episodes into new rules, live. The same image ships
-> a Function Compute handler so consolidation can run on a schedule in production."
+### 1:12–1:35 — The rigor beat (controlled ablation, console Evidence chart)
+> "**Separate experiment — the ablation.** Same tickets, same fixed budget, only the
+> memory differs: no memory sits at chance, 21. Episodic RAG climbs to 60. Mnemo:
+> 71 mean, 100 by the final session. Distilled rules beat raw retrieval when context
+> is finite."
 
-### 2:50–3:00 — Close
-> "Mnemo — an agent that doesn't just remember. It learns. Code's open-source, MIT."
-Show repo URL + the accuracy chart one last time.
+Open with the frame-break ("separate experiment") — a distracted judge hears 71
+twice in a minute and must not conflate the two tables. Cursor touches each of the
+three chart lines as its number is spoken.
+
+### 1:35–2:25 — The killer beat (both workspaces — MANDATORY, not optional)
+This is the single most innovative 15 seconds — the beat no vector-store competitor
+can copy. **Paste the ticket from clipboard, never type on camera.**
+
+- In the **Northwind** workspace, paste: *"Please refund my duplicate subscription
+  charge."* While the live Qwen call runs:
+> "That's a live Qwen3.7-Max call, steered by six retrieved memories under a hard
+> budget."
+- On the answer:
+> "Surface reading says billing. Mnemo routes it to **account** — because it
+> *learned* Northwind's policy. And it shows its work: the decision ledger cites the
+> fired rule, which the Dreaming loop wrote itself."
+- Switch to **Globex** (the ledger clears on workspace switch — expected, don't
+  react), paste the same ticket:
+> "Same model, same ticket, different org — **billing** here, because Globex has no
+> such policy. Each workspace cites its own learned memory."
+- One line while the Globex call runs:
+> "Rules that prove wrong lose confidence and fade; refined rules supersede stale
+> ones — it unlearns, and there's a regression test proving it."
+
+### 2:25–2:48 — Running on Alibaba Cloud (eligibility beat)
+Screen: Alibaba Cloud console, ECS instance list, Singapore region — **hover the
+public IP** — then a large-font terminal: `GET http://47.84.232.162:8000/health` →
+`"mode": "qwen-live"`, `"qwen_model": "qwen3.7-max"` — then back to the browser with
+the **same IP in the URL bar**. The IP match is the proof; let the camera dwell on it.
+
+> "Running right now on this ECS instance in Singapore — mode qwen-live, Qwen3.7-Max
+> and Qwen embeddings through Model Studio. The same image ships a Function Compute
+> handler for scheduled consolidation."
+
+**Do NOT click "Consolidate now" on camera.** Seeding already consolidated
+everything, so it will answer *"Nothing new to consolidate"* — a live failure. The
+fired-rule flash in triage plus `/health` already prove liveness. (Only if you
+insist on showing it: pre-stage off camera by triaging + correcting 3–4 tickets —
+stay under 8, the auto-dream threshold — verify unconsolidated episodes exist, click
+it at the *start* of this beat, and talk over the 10–30s wait. Never show a result
+strip that says "+0 rules.")
+
+### 2:48–3:00 — Close (rubric mirror, end on the scoreboard)
+> "Every organization has knowledge no model can know. Mnemo is the memory
+> architecture that learns it — measured, zero to one hundred, live, every
+> prediction committed — running right now on Alibaba Cloud with Qwen3.7-Max. Open
+> source, MIT. Mnemo doesn't just remember. It learns."
+
+Screen: back on the landing scoreboard (not the repo URL) for the final frame.
 
 ---
 
-**Recording tips**
-- The live store is in-memory: if the container ever restarts, seed both workspaces
-  again before filming (`POST /seed {"user_id":"northwind","profile":"conventions"}`
-  and `{"user_id":"globex","profile":"standard"}`) so the memory browser and triage
-  provenance are populated. Sanity-check `GET /memory?user_id=northwind` first.
-- Both evidence charts are cached server-side after first load — open the console
-  once before recording so they render instantly on camera.
+**Pre-record checklist**
+- **Pre-load every page you will show** — landing, /evidence, /how, console, and the
+  Alibaba ECS console tab — before hitting record. Evidence charts are server-cached
+  only after first load, and the landing pulls Google Fonts, which on this machine's
+  flaky DNS can flash unstyled text on a cold first frame.
+- The live store is in-memory: sanity-check `GET /memory?user_id=northwind` is
+  populated. If the container restarted, re-seed both workspaces first
+  (`POST /seed {"user_id":"northwind","profile":"conventions"}` and
+  `{"user_id":"globex","profile":"standard"}`).
+- Do one **throwaway triage in each workspace** right before recording — warms the
+  path and tells you the live-call latency you'll be talking over.
+- Put the demo ticket text on the clipboard.
+- Clean browser window: no bookmarks bar, no background tabs (especially not Model
+  Studio), 1080p, ~110% zoom. Large terminal font.
 - Record from home/hotspot — the office firewall blocks the ECS IP.
-- Keep the terminal font large. 1080p minimum. Upload to YouTube (public/unlisted).
+- Upload to YouTube (public or unlisted both satisfy Devpost).
+
+**Judging-window ops (Jul 28 – Aug 11)**
+Judges may open the live URL at any time. Once a day: hit
+`GET http://47.84.232.162:8000/memory?user_id=northwind` — if it comes back empty
+(container bounced), re-seed both workspaces immediately with the commands above.
+An empty memory browser routes the refund ticket to *billing* in Northwind and turns
+the demo into a counter-demo. (`MNEMO_AUTOSEED` in the redeployed image should make
+this automatic — the daily check is the backstop.)

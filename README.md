@@ -6,12 +6,14 @@
 
 <p align="center"><img src="docs/console.png" alt="Mnemo console — memory browser, decision ledger, and the two experiments" width="920"></p>
 
-Most "memory agents" are a chatbot bolted to a vector database. Mnemo is a
-**cognitive memory architecture**: raw experience flows in as episodes, and an
-autonomous *Dreaming* loop — powered by **Qwen3.7-Max** — reflects on that
-experience and distils it into durable **semantic facts** and **procedural rules**
-that steer future decisions. We don't just claim it learns; we **prove it** with a
-controlled three-arm experiment.
+Most "memory agents" are a chatbot bolted to a vector database — and even the strong
+frameworks (mem0, Zep, Letta/MemGPT) solve storage and recall, not measured
+improvement. Mnemo is a **cognitive memory architecture**: raw experience flows in as
+episodes, and an autonomous *Dreaming* loop — powered by **Qwen3.7-Max** — reflects on
+that experience and distils it into durable **semantic facts** and **procedural
+rules** that steer future decisions. We don't just claim it learns; we **prove it** —
+a live two-arm experiment on real Qwen3.7-Max, a controlled three-arm ablation, and CI
+that fails the build if the learning curve ever flattens.
 
 **Live console:** http://47.84.232.162:8000 — running on Alibaba Cloud ECS
 (Singapore), real Qwen3.7-Max. *(Up for the judging window.)*
@@ -44,17 +46,82 @@ with no API key (below), and every live prediction is committed to the repo.
 |---|---|---|
 | *"efficient memory storage and retrieval"* | four tiers (episodic/semantic/procedural) with blended scoring: similarity + recency-decay + importance + confidence | **50% smaller context per decision** than raw RAG at higher accuracy — test-locked |
 | *"timely forgetting of outdated information"* | confidence decay on wrong rules, recency-weighted consolidation (mistakes ×2), supersede-on-conflict | [`tests/test_adaptation.py`](backend/tests/test_adaptation.py): a changed refund policy **flips its own rule** within a few corrections |
-| *"recalling critical memories within limited context windows"* | hard per-decision retrieval budget (6 memories), spent across tiers | Exp 1: **+10.5 pts over episodic RAG under the identical budget** |
-| *"increasingly accurate decisions across multi-turn, cross-session interactions"* | the Dreaming loop consolidates between sessions | Live Exp 2: **14 → 71 → 86 → 100%** across sessions, real Qwen3.7-Max |
+| *"recalling critical memories within limited context windows"* | hard per-decision retrieval budget (6 memories), spent across tiers | ablation control: **+10.5 pts over episodic RAG under the identical budget** |
+| *"increasingly accurate decisions across multi-turn, cross-session interactions"* | the Dreaming loop consolidates between sessions | live result: **14 → 71 → 86 → 100%** across sessions, real Qwen3.7-Max |
 
-Every row is enforced by a CI regression test — the build fails if learning ever stops.
+Every row is enforced by a CI regression test on the deterministic offline pipeline —
+the build fails if learning ever stops.
 
 ---
 
-## The result (this is the whole point)
+## The headline result — live: does memory help *Qwen itself*?
+
+The fair challenge to any memory agent: *"wouldn't a frontier model ace this
+zero-shot, no memory needed?"* On generic tickets — yes. So the headline experiment
+uses tickets whose ground truth depends on **organization conventions no model can
+know a priori** — by construction, each convention ticket's surface reading points at
+the wrong queue (disclosed in the dataset docstring). The 0% below is the controlled
+premise, not a gotcha about Qwen; the finding is what the *same model* does with
+Mnemo attached:
+
+| Signal in ticket | Surface reading | Northwind's actual routing |
+|---|---|---|
+| "Project Falcon" | billing / account / shipping | **technical** (white-glove team owns all Falcon tickets) |
+| refund request | billing | **account** (policy: refunds via account managers) |
+| Acme + sync issue | technical | **shipping** (known shipping-feed bug) |
+| beta-build report | technical | **feedback** (beta reports → product team) |
+| purchase-order question | shipping | **billing** (the PO desk) |
+
+Two arms, same tickets: **Qwen3.7-Max zero-shot** vs **Qwen3.7-Max + Mnemo memory**
+(Dreaming consolidation between sessions). Zero-shot never rises above chance-level
+guessing on conventions (0–14% across five sessions) — it has no mechanism to learn
+them. The memory arm learns them from feedback:
+
+```bash
+python -m app.eval.live_harness          # free offline pipeline test
+python -m app.eval.live_harness --yes    # live Qwen3.7-Max run (~160 calls), results
+                                         # checkpointed to results/org_experiment.json
+```
+
+**Live result — real Qwen3.7-Max, both arms** (every prediction logged in
+[`backend/results/org_experiment.json`](backend/results/org_experiment.json)):
+
+```
+convention tickets:        S1   S2   S3   S4   S5
+qwen-alone (zero-shot)      0    0    0    0   14   mean  3%
+qwen+mnemo                 14   71   86  100  100   mean 74%    final gap: +86 pts
+
+plain tickets: zero-shot 98% · with mnemo 95%
+```
+
+Zero-shot Qwen3.7-Max scores **98% on ordinary tickets** — it is a superb model — and
+**0% on org conventions** four sessions straight (14% in the fifth — never above one
+lucky guess), because no amount of model quality can know Northwind's policies. With
+Mnemo, the *same model* reaches **100% by session 4** while retaining **95% on plain
+tickets** — the 3-point dip is the standard interference cost any memory prior pays,
+dwarfed by the +86-point gain where it matters. The Dreaming loop's distilled rules
+are readable, with rationales it wrote itself:
+
+> `IF text mentions 'Project Falcon' THEN category=technical (Project Falcon hardware,
+> workspaces, and add-ons are technical)`
+> `IF text mentions requesting or processing a refund THEN category=account (refund
+> requests are handled under account management)`
+
+The deterministic offline pipeline (same code path, mock client) reproduces the shape
+for free in CI — `tests/test_org_learning.py` asserts all five conventions distill
+correctly on every push.
+
+> **The claim, precisely:** frontier models can't know your organization.
+> Mnemo makes Qwen3.7-Max learn it — measurably.
+
+---
+
+## The control — why distillation, not just retrieval (3-arm ablation)
 
 Support-ticket triage, 8 sessions × 25 tickets, identical tickets and identical
-per-decision context budget across all three arms:
+per-decision context budget across all three arms. This one runs on the
+**deterministic offline pipeline** (same code path, mock client) — an architecture
+ablation that isolates memory design from model variance and runs free in CI:
 
 ```
 session:      1    2    3    4    5    6    7    8
@@ -69,8 +136,8 @@ MNEMO         20   72   72   64   84   72   84  100   mean  71%   (episodic + Dr
   **same finite context budget**, converges faster and higher (**+10.5 pts mean**,
   **100% by session 8**).
 - **Token economics:** Mnemo wins while consuming a **50% smaller memory context**
-  per decision (574 vs 1155 chars) — signal per token, the practical answer to
-  context rot. Test-enforced like everything else.
+  per decision (574 vs 1,155 chars — roughly half the tokens) — signal per token, the
+  practical answer to context rot. Test-enforced like everything else.
 
 And two properties most memory agents can't demonstrate:
 
@@ -97,62 +164,6 @@ $env:MNEMO_OFFLINE=1; python -m app.eval.harness
 > Offline mode uses a deterministic heuristic + hashing embeddings so the pipeline
 > and experiment run anywhere. With `DASHSCOPE_API_KEY` set, the exact same code
 > path runs **Qwen3.7-Max** for reasoning and **Qwen embeddings** for retrieval.
-
----
-
-## Experiment 2 — does memory help *Qwen itself*?
-
-The fair challenge to any memory agent: *"wouldn't a frontier model ace this
-zero-shot, no memory needed?"* On generic tickets — yes. So Experiment 2 uses tickets
-whose ground truth depends on **organization conventions no model can know a priori**:
-
-| Signal in ticket | Surface reading | Northwind's actual routing |
-|---|---|---|
-| "Project Falcon" | billing / account / shipping | **technical** (white-glove team owns all Falcon tickets) |
-| refund request | billing | **account** (policy: refunds via account managers) |
-| Acme + sync issue | technical | **shipping** (known shipping-feed bug) |
-| beta-build report | technical | **feedback** (beta reports → product team) |
-| purchase-order question | shipping | **billing** (the PO desk) |
-
-Two arms, same tickets: **Qwen3.7-Max zero-shot** vs **Qwen3.7-Max + Mnemo memory**
-(Dreaming consolidation between sessions). Zero-shot stays wrong on conventions
-forever — however smart the model, it can't know your org. The memory arm learns them
-from feedback:
-
-```bash
-python -m app.eval.live_harness          # free offline pipeline test
-python -m app.eval.live_harness --yes    # live Qwen3.7-Max run (~160 calls), results
-                                         # checkpointed to results/org_experiment.json
-```
-
-**Live result — real Qwen3.7-Max, both arms** (every prediction logged in
-[`backend/results/org_experiment.json`](backend/results/org_experiment.json)):
-
-```
-convention tickets:        S1   S2   S3   S4   S5
-qwen-alone (zero-shot)      0    0    0    0   14   mean  3%
-qwen+mnemo                 14   71   86  100  100   mean 74%    final gap: +86 pts
-
-plain tickets: zero-shot 98% · with mnemo 95%
-```
-
-Zero-shot Qwen3.7-Max scores **98% on ordinary tickets** — it is a superb model — and
-**0% on org conventions** for four straight sessions, because no amount of model
-quality can know Northwind's policies. With Mnemo, the *same model* reaches **100% by
-session 4**. The Dreaming loop's distilled rules are readable, with rationales it
-wrote itself:
-
-> `IF text mentions 'Project Falcon' THEN category=technical (Project Falcon hardware,
-> workspaces, and add-ons are technical)`
-> `IF text mentions requesting or processing a refund THEN category=account (refund
-> requests are handled under account management)`
-
-The deterministic offline pipeline (same code path, mock client) reproduces the shape
-for free in CI — `tests/test_org_learning.py` asserts all five conventions distill
-correctly on every push.
-
-> **The claim, precisely:** frontier models can't know your organization.
-> Mnemo makes Qwen3.7-Max learn it — measurably.
 
 ---
 

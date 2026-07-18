@@ -1,7 +1,10 @@
 # Endgame — one session, from home/hotspot, in order
 
-Devpost deadline: **Sunday Jul 20, 2:00pm PDT** (= **10:00pm WAT**). Target finishing
-this entire sheet by **Saturday Jul 19** so the deadline never matters. Budget ~2–3
+Devpost deadline: **Sunday Jul 20, 2:00pm PDT** (= **10:00pm WAT**). One organizer
+update post says "PST", which would be an hour *earlier* — treat 2:00pm PDT as the
+wall and submit hours before it. Organizers have stated **no further extensions**.
+Target finishing this entire sheet by **Saturday Jul 19** so the ambiguity never
+matters. Budget ~2–3
 hours. Everything below needs a network that can reach 47.84.232.162:8000 — the office
 FortiGuard blocks it, so this is a home/hotspot session.
 

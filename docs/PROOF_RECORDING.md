@@ -22,15 +22,22 @@ from the 3-min demo video), so it only needs to prove deployment — don't re-pi
 - Log in to the Alibaba Cloud console in one browser tab, region **Singapore**;
   have http://47.84.232.162:8000 open in a second tab; a large-font terminal ready.
 - **Never show on screen:** the `.env` file, `docker inspect mnemo` (it prints env
-  vars including the API key), the Model Studio API-key page, terminal scrollback.
-  Use fresh terminal windows.
+  vars including the API key), `docker logs mnemo` (request bodies), `env`, the
+  Model Studio API-key page, terminal scrollback, the browser tab bar / bookmarks
+  (a visible Model Studio tab title invites questions), or any Alibaba console
+  billing/account page. Use fresh terminal windows and a clean browser window.
+- If you'll do the optional Workbench beat, **pre-open the Workbench session in its
+  own tab before recording** — the connect flow can prompt for the instance
+  password, and a credential prompt mid-take kills the recording.
 
 ## The recording, beat by beat
 
 1. **(0:00) Alibaba Cloud console — ECS → Instances** (Singapore region).
-   Point at the instance: ID `i-t4n1vhjybtduj4xiluf9`, status *Running*, public IP
-   **47.84.232.162**. Say: *"Mnemo runs on this Alibaba Cloud ECS instance in
-   Singapore."*
+   Point at the instance: ID `i-t4n1vhjybtduj4xiluf9`, status *Running*, and
+   **hover/linger on the public IP 47.84.232.162** — the IP appearing identically in
+   the console, the terminal command, and the browser URL bar IS the proof; make the
+   camera dwell on it each time. Say: *"Mnemo runs on this Alibaba Cloud ECS
+   instance in Singapore."*
 
 2. **(0:15) Terminal — health on the public IP:**
    ```powershell
@@ -39,17 +46,22 @@ from the 3-min demo video), so it only needs to prove deployment — don't re-pi
    Point at `"mode": "qwen-live"` and `"qwen_model": "qwen3.7-max"`:
    *"Live mode — real Qwen3.7-Max through Alibaba Cloud Model Studio."*
 
-3. **(0:30, optional but strong) Console → the instance → Connect → Workbench:**
+3. **(0:30, optional) Pre-opened Workbench tab:**
    ```bash
    docker ps
    ```
-   One container, `mnemo`, up, port 8000. (Nothing else — exit Workbench.)
+   One container, `mnemo`, up, port 8000. (Nothing else — only `docker ps`, never
+   `docker logs` or `env` — then leave the tab.) Skip this beat entirely if the
+   Workbench session isn't already open; the IP match carries the proof on its own.
 
-4. **(0:45) Browser — http://47.84.232.162:8000.** Landing page, click *Open the
-   console*, type a ticket in the triage box (Northwind workspace):
-   *"Please refund my duplicate subscription charge"* → decision + the numbered
-   evidence ledger appears. *"A live decision, made by Qwen3.7-Max steered by
-   learned memory, served from this ECS instance."*
+4. **(0:45) Browser — http://47.84.232.162:8000** (same IP in the URL bar — linger).
+   Landing page, click *Open the console*, paste the clipboard ticket in the triage
+   box (Northwind workspace): *"Please refund my duplicate subscription charge"*.
+   The triage is a live Qwen call (10–30s) — don't wait in silence; speak the close
+   over it: *"A live decision, made by Qwen3.7-Max steered by learned memory,
+   served from this ECS instance."* If the wait feels long on the throwaway run,
+   end on the landing page + `/health` instead — the triage is a re-pitch, not the
+   proof.
 
 5. **(1:15) Close** on the health response or the console. Done.
 
