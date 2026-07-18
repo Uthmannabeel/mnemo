@@ -1,10 +1,26 @@
 # Endgame — one session, from home/hotspot, in order
 
-Devpost deadline: **Sunday Jul 20, 2:00pm PDT** (= **10:00pm WAT**). One organizer
-update post says "PST", which would be an hour *earlier* — treat 2:00pm PDT as the
-wall and submit hours before it. Organizers have stated **no further extensions**.
-Target finishing this entire sheet by **Saturday Jul 19** so the ambiguity never
-matters. Budget ~2–3
+Devpost deadline: **Sunday Jul 20, 2:00pm PDT** (= **10:00pm WAT**), confirmed —
+the one "PST" organizer post was sloppy shorthand (PST doesn't exist in July), and
+Devpost's countdown + the "5:00 PM EDT" final update agree on PDT. No further
+extensions. Target finishing this entire sheet **today (Sat Jul 19)**.
+
+**Process intel (verified from the rules + organizer updates):**
+- **Early submit + edit is explicitly allowed** — save a draft NOW, submit a
+  complete entry as soon as the links exist, and keep polishing until the
+  deadline. Open the form early: it may have hackathon-specific questions you
+  don't want to discover at 1:50pm.
+- The judging filter is Alibaba DevRel, not researchers: the sole named judge
+  authored "Proof of Deployment 101 — What Judges Need to See". Proof =
+  (1) a deep link to a **code file showing the Alibaba base URL**
+  (backend/app/config.py — link is in SUBMISSION.md) and (2) a **screenshot of
+  running resources in the Alibaba console/Workbench** — take one of the ECS
+  instance page and add it to the Devpost gallery.
+- Video: **public on YouTube, Vimeo, or Youku** — make it *public*, not
+  unlisted, to be safe — under 3:00, and **no copyrighted background music**.
+- After the deadline the Submission is frozen and judges test Jul 28–Aug 11:
+  tag the repo (`git tag v1.0-submission && git push --tags`) at submit time
+  and avoid substantive pushes to main during judging. Budget ~2–3
 hours. Everything below needs a network that can reach 47.84.232.162:8000 — the office
 FortiGuard blocks it, so this is a home/hotspot session.
 

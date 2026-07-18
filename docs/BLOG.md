@@ -30,8 +30,8 @@ Human memory isn't one bucket. Cognitive scientists carve it roughly into:
 
 - **Working memory** — the handful of things you're holding right now.
 - **Episodic memory** — specific events. *"On Tuesday a customer was charged twice."*
-- **Semantic memory** — distilled facts. *"Duplicate-charge complaints are usually billing."*
-- **Procedural memory** — skills and rules you run without re-deriving. *"Refund requests → billing queue."*
+- **Semantic memory** — distilled facts. *"Error-code-500 reports are usually technical."*
+- **Procedural memory** — skills and rules you run without re-deriving. *"Acme sync issues → shipping queue."*
 
 The magic isn't any single tier — it's the **flow between them**. You live through
 episodes, and while you sleep your brain consolidates the useful ones into durable

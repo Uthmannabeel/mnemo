@@ -43,8 +43,9 @@ language): it is the best answer to "a keyword table could do this."
 ### 0:50–1:12 — The architecture (/how page, architecture.svg)
 > "Four memory tiers, modelled on human memory. Every ticket becomes a raw
 > *episode*. A background **Dreaming loop** — Qwen3.7-Max itself — reflects and
-> distils them into **semantic facts** and **procedural rules**. Under a finite
-> context budget, a handful of distilled rules beats a pile of noisy tickets."
+> distils them into **semantic facts** and **procedural rules**, **fully
+> autonomously: no human approves a merge**. Under a finite context budget, a
+> handful of distilled rules beats a pile of noisy tickets."
 
 Screen: the /how page (serves architecture.svg locally — no GitHub detour).
 

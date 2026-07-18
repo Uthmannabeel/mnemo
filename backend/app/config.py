@@ -14,7 +14,9 @@ class Settings(BaseSettings):
         env_file=Path(__file__).resolve().parents[1] / ".env", extra="ignore"
     )
 
-    # Qwen Cloud / DashScope
+    # Qwen Cloud / DashScope — Alibaba Cloud Model Studio OpenAI-compatible
+    # endpoint. The live ECS deployment overrides this via QWEN_BASE_URL with its
+    # region workspace endpoint (ap-southeast-1); dashscope-intl works equally.
     dashscope_api_key: str = ""
     qwen_base_url: str = "https://dashscope-us.aliyuncs.com/compatible-mode/v1"
     qwen_model: str = "qwen3.7-max"

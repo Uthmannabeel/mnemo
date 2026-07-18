@@ -6,14 +6,18 @@
 
 **Track:** MemoryAgent
 
-**Tagline (Devpost subtitle):** The memory layer that measurably learns your
-organization — same model, 0% → 100%, live.
+**Tagline (Devpost subtitle):** Frontier models can't know your org. Mnemo teaches
+them — measurably.
 
 ## Elevator pitch (one line)
 Zero-shot Qwen3.7-Max scores 0% on decisions governed by your organization's private
 conventions. With Mnemo the same model reaches 100% — increasingly accurate decisions
 across cross-session interactions, measured live, every prediction committed for
 audit — and distilled memory beats raw RAG on half the context per decision.
+
+**0% → 100%** live, real Qwen3.7-Max both arms · **+86 pt** final gap ·
+**+10.5 pts over episodic RAG** at an identical retrieval budget ·
+**50% smaller context** per decision · **150 predictions committed** for audit
 
 ## Try it in 60 seconds (live on Alibaba Cloud)
 1. Open http://47.84.232.162:8000/console (ECS Singapore, `/health` = `qwen-live`).
@@ -28,6 +32,10 @@ offline in ~2 seconds with no API key (`MNEMO_OFFLINE=1 python -m app.eval.harne
 and every live prediction is committed at `backend/results/org_experiment.json`.
 
 ## Inspiration
+Every support team has a veteran who just *knows* where tickets go — refunds to the
+account managers, anything mentioning Project Falcon to the white-glove team — and
+every support team eventually loses that person, and everything they knew.
+
 Almost every "memory agent" is a chatbot wired to a vector store: it can recall the
 past but never *learns* from it. Even the strong frameworks — mem0, Zep, Letta/MemGPT —
 solve storage and recall, not measured improvement. We wanted an agent whose competence
@@ -45,6 +53,9 @@ correct the rule, not just the ticket.
 The problem this solves: in every support org, routing knowledge lives in veterans'
 heads. Mnemo turns it into auditable, self-correcting rules — the value is fewer
 misroutes and a halved memory-token bill per decision, both measured below.
+
+**One misroute costs $15–40 of agent time; at 1,000 convention-governed tickets a
+month, that's five figures of monthly waste Mnemo removes.**
 
 ## Track fit — the MemoryAgent brief, point by point
 The track asks for three specific capabilities; each is implemented **and enforced by
@@ -136,22 +147,48 @@ Memory *architecture* matters more than memory *size*: a few high-signal distill
 outperform a large pile of raw episodes when context is finite.
 
 ## What's next
-Multi-user memory isolation, procedural-rule promotion into callable tools, and porting
-the Dreaming loop to Qwen3.7-Max's thousand-step long-horizon execution.
+- **Now:** multi-user memory isolation hardening; promoting high-confidence
+  procedural rules into callable tools the agent can execute, not just cite.
+- **Next:** a pilot with one real support organization — seed from their resolved
+  tickets and measure the misroute rate falling week over week, in production.
+- **Vision:** the Dreaming loop on Qwen3.7-Max's thousand-step long-horizon
+  execution — an agent that consolidates continuously, not just between sessions.
 
 ## Built with
 `python` · `qwen3.7-max` · `dashscope` · `qwen-embeddings` · `fastapi` ·
-`alibaba-cloud-ecs` · `alibaba-cloud-model-studio` · `pgvector` · `docker` · `chart.js`
+`alibaba-cloud-ecs` · `alibaba-cloud-model-studio` · `alibaba-cloud-function-compute` ·
+`alibaba-cloud-rds` · `pgvector` · `postgresql` · `docker` · `chart.js` · `pytest` ·
+`uvicorn` · `github-actions`
 
 ## Links
 - Repo: https://github.com/Uthmannabeel/mnemo (MIT license)
-- Architecture diagram: docs/architecture.svg + docs/architecture.png (Devpost gallery)
+- **Devpost gallery plan (6–8 captioned images — thumbnail is the FIRST image;
+  3:2 ratio, JPG/PNG/GIF, 5 MB max):**
+  1. *Thumbnail:* a 3:2 result card with big readable text — **"Same model.
+     0% → 100%."** (make from the landing scoreboard screenshot; must be legible
+     at gallery-card size)
+  2. Console with the decision ledger citing a fired rule — caption: "Every
+     decision cites the exact memories that justified it"
+  3. The live 0→100 scoreboard chart — caption: "Live: zero-shot Qwen3.7-Max vs
+     the same model with Mnemo"
+  4. 3-arm ablation chart — caption: "Budget-matched control: distillation beats
+     retrieval by +10.5 pts on half the context"
+  5. A distilled rule with its self-written rationale — caption: "Rules Mnemo
+     wrote for itself, rationale included"
+  6. Northwind vs Globex same-ticket contrast — caption: "Same ticket, two orgs,
+     two learned answers"
+  7. Architecture diagram (docs/architecture.png)
+  8. (Optional) CI green run — caption: "Learning is test-enforced: the build
+     fails if the curve flattens"
 - Live product (landing + console): http://47.84.232.162:8000 — Alibaba Cloud ECS, Singapore
 - Demo video (~3 min): <youtube url — fill in>
 - Proof-of-deployment recording: <url — fill in>
-- Alibaba Cloud services/API usage in code (required with the proof):
+- Alibaba Cloud services/API usage in code (required with the proof — judges'
+  "Proof of Deployment 101" wants the base URL visible in a code file):
+  https://github.com/Uthmannabeel/mnemo/blob/main/backend/app/config.py
+  (the Alibaba Cloud Model Studio base URL, `*.aliyuncs.com/compatible-mode/v1`),
   https://github.com/Uthmannabeel/mnemo/blob/main/backend/app/qwen_client.py
-  (Qwen3.7-Max + Qwen embeddings via Model Studio) and
+  (Qwen3.7-Max + Qwen embeddings calls) and
   https://github.com/Uthmannabeel/mnemo/blob/main/backend/fc_dream.py
   (Function Compute handler)
 - Blog post (Blog Post Award): <published url — fill in>

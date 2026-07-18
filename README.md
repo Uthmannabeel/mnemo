@@ -201,8 +201,9 @@ memory ids that justified it.
   using `preserve_thinking` to keep reasoning context coherent across turns.
 - **Qwen embeddings** (`text-embedding-v4`) for the episodic vector index.
 - Deployed on **Alibaba Cloud**: live on ECS (Singapore) —
-  **http://47.84.232.162:8000** — with a pgvector-on-RDS store backend and a
-  Function Compute handler (`fc_dream.py`) for scheduled Dreaming in production.
+  **http://47.84.232.162:8000**. The store abstraction also ships a pgvector-on-RDS
+  backend, and a Function Compute handler (`fc_dream.py`) covers scheduled Dreaming
+  for the production topology.
 
 See [`docs/DEPLOY.md`](docs/DEPLOY.md) for the Alibaba Cloud deployment.
 
